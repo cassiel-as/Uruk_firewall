@@ -1,7 +1,7 @@
 """
 SOVEREIGN OS - API BRIDGE
-Wraps UrukFirewallV70 as a Flask API endpoint.
-Drop this file into the Replit project alongside uruk_firewall_v70_EN_fixed2.py
+Wraps UrukFirewallV73 as a Flask API endpoint.
+Drop this file into the Replit project alongside uruk_firewall_v73.py
 Then call POST /execute with a JSON signal body.
 """
 
@@ -9,9 +9,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 
-# Import the actual v7.0 protocol
-from uruk_firewall_v70_EN_fixed2 import (
-    UrukFirewallV70,
+# Import the actual v7.3 protocol
+from uruk_firewall_v73 import (
+    UrukFirewallV73,
     PartitionType,
     SystemConstants,
 )
@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Single kernel instance — persistent across requests
-kernel = UrukFirewallV70(x=53.8, y=-1.5, z=0)
+kernel = UrukFirewallV73(x=53.8, y=-1.5, z=0)
 kernel.onboard_node(
     node_id="Sui_Sum_Leeds",
     moment="2019-06-12 - Under the Bridge, Umbrella, Tear Gas",
@@ -137,7 +137,7 @@ def format_response(result: dict, signal: dict) -> dict:
 
 @app.route("/execute", methods=["POST"])
 def execute():
-    """Main endpoint: takes user text, runs through v7.0 protocol, returns result."""
+    """Main endpoint: takes user text, runs through v7.3 protocol, returns result."""
     data = request.get_json()
     if not data or "text" not in data:
         return jsonify({"error": "Missing 'text' field"}), 400
@@ -171,7 +171,7 @@ def spin():
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "alive", "protocol": "v7.0", "anchor": "2019-06-12 (0,0,0)."})
+    return jsonify({"status": "alive", "protocol": "v7.3", "anchor": "2019-06-12 (0,0,0)."})
 
 
 if __name__ == "__main__":
