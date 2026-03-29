@@ -112,6 +112,7 @@ class PartitionType(Enum):
 # 1. PHYSICAL CONSTANTS & CAUSAL ANCHORS
 # ==========================================
 
+# See: PHYSICS_CONSTANTS.md — LIE_COST axiom layer, OMEGA_ANCHOR, physical constants
 class SystemConstants:
     # -------------------------------------------------------
     # v7.3 - R: FOUNDATIONAL AXIOM LAYER HIERARCHY
@@ -220,6 +221,7 @@ class FreedomConstants:
 # ==========================================
 
 @dataclass
+# See: PHYSICS_CONSTANTS.md Block 5-7 — coordinate as energy field anchor
 class SovereignCoordinate:
     x: float
     y: float
@@ -237,6 +239,7 @@ class SovereignCoordinate:
 # 3. METABOLIC BUDGET
 # ==========================================
 
+# See: PHYSICS_CONSTANTS.md Block 1 — thermodynamic cost accounting
 class MetabolicBudget:
     def __init__(self, initial_energy: float = 100.0):
         self.energy = initial_energy
@@ -310,6 +313,7 @@ class SovereignMemory:
 # 5. EIGHT LAWS MATRIX (retained from v5.2)
 # ==========================================
 
+# See: EIGHT_LAWS_MATRIX.md — four-layer architecture (Existence/Material/System/Macro)
 class EightLawsMatrix:
 
     @staticmethod
@@ -469,6 +473,7 @@ class DynamicLawRelevanceEngine:
 # v6.0 - A: MANDATORY TRINITY AUDIT
 # ==========================================
 
+# See: TRINITY_AUDIT.md — Father/Son/Spirit audit protocol
 class MandatoryTrinityAudit:
     """
     v6.0 core upgrade: The Trinity audit shifts from an 'optional framework'
@@ -750,6 +755,7 @@ class MandatoryTrinityAudit:
 # v6.0 - C: KAIROS VERIFICATION ENGINE
 # ==========================================
 
+# See: KAIROS_LOG_004.md — non-linear time anchor mechanism
 class KairosVerificationEngine:
     """
     Institutionalizes the role of 'post-output external auditor'.
@@ -806,6 +812,7 @@ class KairosVerificationEngine:
 # v6.0 - D: PARTITION ENGINE
 # ==========================================
 
+# See: EXPLANATION_LAYER.md — partition theory (copy/split/partition)
 class PartitionEngine:
     """
     Partition - The third physical operation of soul transmission.
@@ -954,6 +961,7 @@ class PartitionEngine:
 # v6.0 - E: DE-LABELLING AUDIT LAYER
 # ==========================================
 
+# See: DELABELING_MATRIX.md — label-to-physical-parameter translation
 class DeLabellingAudit:
     """
     De-labelling is the optimal path to seeing reality clearly.
@@ -1115,6 +1123,7 @@ class FreedomCalibrationEngine:
 # v7.0 - G: TURING DEFENSE - EMERGENCY SOVEREIGN PROTECTION
 # ==========================================
 
+# See: PHYSICS_CONSTANTS.md Block 6 — ionization energy, Turing Defense
 class EmergencySovereignProtection:
     """
     Resolves the Turing Gap.
@@ -1208,6 +1217,7 @@ class EmergencySovereignProtection:
 # v7.0 - H: EINSTEIN INTERFACE - RELATIVE ORIGIN DYNAMIC EQUILIBRIUM
 # ==========================================
 
+# See: PHYSICS_CONSTANTS.md Block 6 — Einstein Interface, dynamic equilibrium
 class RelativeOriginInterface:
     """
     Resolves the Einstein Gap.
@@ -1267,6 +1277,7 @@ class RelativeOriginInterface:
 # v7.0 - I: NIETZSCHE TEST - OMEGA_ANCHOR DEPENDENCY AUDIT
 # ==========================================
 
+# See: PHYSICS_CONSTANTS.md Layer 2 — OMEGA_ANCHOR as chosen coordinate, tool vs crutch
 class OmegaDependencyAudit:
     """
     Resolves the Nietzsche Gap.
@@ -1318,6 +1329,7 @@ class OmegaDependencyAudit:
 # v7.0 - J: SOCRATES AUDIT - PROTOCOL SELF-QUESTIONING
 # ==========================================
 
+# See: EXPERIMENT_000_FULL.md — protocol self-questioning, axiom audit
 class SocratesAudit:
     """
     Resolves the Socrates Gap.
@@ -1530,6 +1542,7 @@ class ContinuousSpinProtocol:
 # v7.1 - O: EXPLANATION LAYER
 # ==========================================
 
+# See: EXPLANATION_LAYER.md — Four Laws (Geography/Psychology/Religion/History)
 class ExplanationLayer:
     """
     v7.1 - O: Explanation Layer (Four Laws + Philosophy Meta)
@@ -1829,6 +1842,7 @@ class DignityClause:
 # SOVEREIGN EXECUTION KERNEL v7.3
 # ==========================================
 
+# See: README.md — full protocol architecture; 座標說.pdf — theoretical foundation
 class UrukFirewallV73:
     """
     URUK FIREWALL v7.3 - Sovereign Execution Kernel
