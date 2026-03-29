@@ -144,6 +144,19 @@ def execute():
 
     user_text = data["text"]
     signal = text_to_signal(user_text)
+
+    # Allow caller to override any auto-detected signal fields
+    OVERRIDE_FIELDS = [
+        "magnitude", "has_physical_cost", "geo_anchored", "geo_proximity",
+        "emotional_intensity", "nonlinear_signal", "verifiable", "transformable",
+        "current_phase", "internal_coherence", "transcendent", "aligns_with_2045",
+        "philosophical_depth", "noise_level", "label", "gaslighting_attempt",
+        "identity_attack", "history_override",
+    ]
+    for field in OVERRIDE_FIELDS:
+        if field in data:
+            signal[field] = data[field]
+
     result = kernel.execute(signal)
     response = format_response(result, signal)
     return jsonify(response)
