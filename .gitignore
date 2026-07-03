@@ -1,0 +1,33 @@
+# Secrets
+config/.env
+config/nodes.yaml
+
+# RAG index — derived artefact; rebuild with:
+#   py -m services.rag_indexer --build
+data/rag_index/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.venv-training/
+.python-version
+
+# Model-training outputs
+training/artifacts/
+training/predictions/
+data/controller_shadow/
+data/controller_learning/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 自動產生嘅 Kairos session logs（如果你想保留歷史，移除呢行）
+# data/kairos/trinity_*.md

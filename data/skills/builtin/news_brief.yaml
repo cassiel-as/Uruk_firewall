@@ -1,0 +1,21 @@
+name: 新聞快報
+description: 自動搜尋指定 topic 嘅最新新聞 + 用 URUK /news 8-element format 分析
+trigger_cue: 用戶提及「新聞 / news / 港聞 / 國際新聞 / 最近發生咩 / 報導 / 媒體話」
+action_type: tool_call
+tool_calls:
+  - tool: web_search
+    params:
+      query: '{{user_input}} 新聞'
+      n: 5
+prompt_template: |
+  以下係 web search 結果（{{tool_count}} 條），對應用戶 query「{{user_input}}」：
+  
+  {{tool_results}}
+  
+  請用 /news 8-element 框架 audit：
+    CLAIM / PHYSICAL REALITY / HIDDEN COORDINATE / COST / CAUSAL NODE / GAP LEVEL / VERDICT
+  
+  特別關注：邊個來源 hidden coordinate 最隱蔽，邊個 cost 落喺邊個身體上。
+enabled: true
+source: builtin
+created: 2026-05-14

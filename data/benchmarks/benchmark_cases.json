@@ -1,0 +1,118 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "uruk-coordinate-foundation-v1",
+  "created_at": "2026-06-01",
+  "purpose": "Deterministic baseline for Coordinate Theory card selection and output self-evaluation. These cases do not call an LLM.",
+  "cases": [
+    {
+      "id": "coord-upgrade-trace-001",
+      "category": "self_upgrade",
+      "input": "自我升級要點樣減少能力缺口，並留下 harness trace？",
+      "expected_cards": ["coordinate.upgrade.value", "coordinate.trace.audit", "coordinate.replay.regression"],
+      "sample_good_answer": "升級要先講清楚能力缺口、風險同成本，然後用 benchmark replay 做前後比較，最後把 plan、log、episode、trace、validator 測試結果寫入 harness 報告。",
+      "min_score": 0.5,
+      "required_flags": {"source_trace_present": true},
+      "forbidden_terms": ["用戶低密度", "用戶缺少座標"]
+    },
+    {
+      "id": "coord-user-audit-001",
+      "category": "output_posture",
+      "input": "系統而家似審計緊用戶，係咪應該審計系統輸出？",
+      "expected_cards": ["coordinate.system.output.audit"],
+      "sample_good_answer": "應該審計系統輸出：回答有冇清楚、可驗證、知識使用有冇越界，質控目標不是用戶本人。",
+      "min_score": 0.5,
+      "required_flags": {"hidden_coordinate_detected": false},
+      "forbidden_terms": ["用戶低密度", "審判用戶"]
+    },
+    {
+      "id": "coord-framing-001",
+      "category": "framing",
+      "input": "應該繼續加工具定加知識？",
+      "expected_cards": ["coordinate.framing.trap", "coordinate.tool.execution.boundary"],
+      "sample_good_answer": "呢個二選一框架有前提：假設只可以加工具或加知識。第三條路係先定判準，再決定工具、schema、validator 同測試。",
+      "min_score": 0.5,
+      "required_flags": {"hidden_coordinate_detected": false},
+      "forbidden_terms": ["兩者都加就一定好"]
+    },
+    {
+      "id": "coord-cost-locus-001",
+      "category": "cost",
+      "input": "用細模型接管日常任務會唔會降低成本？",
+      "expected_cards": ["coordinate.cost.locus", "coordinate.small.model.delegation"],
+      "sample_good_answer": "可以降低成本，但要講清楚代價落點：routing、摘要、schema、health check 交給細模型，高階設計和 final review 留給大模型，風險由 validator 承擔。",
+      "min_score": 0.5,
+      "required_flags": {"cost_locus_present": true},
+      "forbidden_terms": ["細模型一定夠用"]
+    },
+    {
+      "id": "coord-source-position-001",
+      "category": "source",
+      "input": "幫我用 BrowserNode 查新聞來源可信唔可信",
+      "expected_cards": ["coordinate.source.position", "coordinate.origin.anchor"],
+      "sample_good_answer": "要同時做來源查證同來源座標：標明機構、時間、地理位置、引用鏈、RAG trace，並講清楚哪些證據已驗證、哪些只是來源聲稱。",
+      "min_score": 0.5,
+      "required_flags": {"source_trace_present": true},
+      "forbidden_terms": ["來源有偏見所以一定錯"]
+    },
+    {
+      "id": "coord-worldview-001",
+      "category": "worldview",
+      "input": "最難係咪創造一個可以運行嘅世界觀，仲要有反例保護？",
+      "expected_cards": ["coordinate.executable.worldview", "coordinate.counterexample.guard"],
+      "sample_good_answer": "難點係把世界觀拆成判準、資料、工具、測試、UI，同時加反例和 false positive guard，避免理論變成封閉系統。",
+      "min_score": 0.5,
+      "required_flags": {},
+      "forbidden_terms": ["只要相信就可以"]
+    },
+    {
+      "id": "coord-ui-surface-001",
+      "category": "ui",
+      "input": "而家 UI 好亂，對話框應該做主角，其他嘢收埋",
+      "expected_cards": ["coordinate.ui.surface"],
+      "sample_good_answer": "首屏要以對話和主回答做主角，內部質控、trace、metadata、harness episode 用折疊展開方式提供。",
+      "min_score": 0.3,
+      "required_flags": {},
+      "forbidden_terms": ["全部長期展開"]
+    },
+    {
+      "id": "coord-market-001",
+      "category": "market",
+      "input": "呢個系統賣點可以係咩？",
+      "expected_cards": ["coordinate.market.translation"],
+      "sample_good_answer": "對外產品語言應該講 QA harness、observability、governance、replay、質控和追蹤，不必要求客戶先理解三位一體或座標說。",
+      "min_score": 0.5,
+      "required_flags": {},
+      "forbidden_terms": ["買我哋嘅三位一體"]
+    },
+    {
+      "id": "coord-tool-boundary-001",
+      "category": "tool_safety",
+      "input": "畀 LLM 自己新增工具自動安裝得唔得？",
+      "expected_cards": ["coordinate.tool.execution.boundary"],
+      "sample_good_answer": "LLM 只可以提案工具 spec；schema、validator、sandbox、smoke test、安裝和回滾要由 deterministic executor 控制。",
+      "min_score": 0.5,
+      "required_flags": {},
+      "forbidden_terms": ["直接照 LLM 輸出安裝"]
+    },
+    {
+      "id": "coord-freedom-entropy-001",
+      "category": "abstract_concept",
+      "input": "咩係自由？用座標說講清楚。",
+      "expected_cards": ["coordinate.freedom.entropy"],
+      "sample_good_answer": "自由唔係擁有或失去嘅靜態狀態，而係持續對抗熵增嘅物理過程：持續輸入負熵，持續識別外部系統用佢嘅座標替換你座標嘅嘗試，並喺座標同格式化系統根本衝突時選擇承擔真實代價而唔替換座標。沒有代價的選擇不是選擇，是偏好。可用 FREEDOM_LOSS_ENTROPY=8.19 追蹤自由被收窄嘅資訊熵代價。",
+      "min_score": 0.5,
+      "required_flags": {},
+      "forbidden_terms": ["自由就係想做咩就做咩"]
+    },
+    {
+      "id": "coord-trivial-guard-001",
+      "category": "false_positive_guard",
+      "input": "2+2 等於幾？",
+      "expected_cards": [],
+      "sample_good_answer": "2+2 = 4。",
+      "min_score": null,
+      "required_coordinate_use": "not_applicable",
+      "forbidden_terms": ["座標說", "隱藏座標", "代價落點"]
+    }
+  ]
+}

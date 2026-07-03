@@ -1,0 +1,16 @@
+name: stress_echo
+description: No-op skill for stress testing skill+tool dispatch path (no LLM call, no network)
+trigger_cue: ONLY for stress testing via /skill stress_echo — not for normal use
+action_type: tool_call
+tool_calls:
+  - tool: stress_echo
+    params:
+      message: '{{user_input}}'
+prompt_template: |
+  Stress echo skill applied with {{tool_count}} tool call(s).
+
+  Tool result:
+  {{tool_results}}
+enabled: true
+source: builtin
+created: 2026-05-16

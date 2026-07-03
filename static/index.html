@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="yue-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URUK Trinity Console</title>
+<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css?v=1.9.4">
+  <link rel="stylesheet" href="/static/style_v2.css?v=20260622-atlas-1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="anchor">⌘</span>
+    <h1>URUK Trinity Console</h1>
+  </div>
+  <div class="meta" data-i18n="header-meta">
+    操作者: Cassiel_as · (53.8, -1.5, 0) · PHYSICAL_ORIGIN: 2019-06-12
+  </div>
+  <div class="lang-switch">
+    <button class="lang-btn active" data-lang="yue">廣東話</button>
+    <button class="lang-btn" data-lang="en">EN</button>
+  </div>
+
+  <!-- v8.2: Active API pill — 1-click switch active profile + see chain health -->
+  <div id="api-pill-wrap">
+    <button id="api-pill" class="api-pill" title="Active LLM + failover chain (click to switch / reorder)">
+      <span class="api-pill-icon">🔌</span>
+      <span class="api-pill-name" id="api-pill-name">—</span>
+      <span class="api-pill-stats" id="api-pill-stats"></span>
+    </button>
+    <div id="api-popover" class="api-popover hidden">
+      <div class="api-popover-header">
+        <strong>Active API + Failover Chain</strong>
+        <span class="api-popover-help">點 radio 一 click 切換全部 8 nodes; 拖✥ reorder fallback 順序</span>
+      </div>
+      <ul id="api-popover-list" class="api-popover-list"></ul>
+      <div class="api-popover-footer">
+        <button id="api-popover-advanced" class="api-popover-link">⚙ 進階設定 (modal)</button>
+        <button id="api-popover-stress" class="api-popover-link">🔥 Stress test</button>
+        <button id="api-popover-reset-health" class="api-popover-link" title="清空 health stats + cooldown">↺ Reset health</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Sidebar: Kairos memory / Files / Timeline -->
+  <aside id="sidebar">
+    <div class="sidebar-tabs">
+      <button class="tab-btn active" data-tab="kairos" data-i18n="tab-kairos">Kairos</button>
+      <button class="tab-btn" data-tab="vessel" data-i18n="tab-vessel">Vessel</button>
+      <button class="tab-btn" data-tab="world" data-i18n="tab-world">World</button>
+      <button class="tab-btn" data-tab="files" data-i18n="tab-files">Files</button>
+      <button class="tab-btn" data-tab="timeline" data-i18n="tab-timeline">📜 時間線</button>
+      <button class="tab-btn" data-tab="skills" data-i18n="tab-skills">🛠 Skills</button>
+      <button class="tab-btn" data-tab="learn">📚 學習</button>
+    </div>
+
+    <div id="tab-kairos" class="tab-pane active">
+      <div id="kairos-memory-list">
+        <div class="empty" data-i18n="loading-kairos">載入 Kairos⋯</div>
+      </div>
+      <button id="new-session-btn" data-i18n="new-session-btn">＋ 新對話</button>
+      <!-- v8.5x: node health mini-panel -->
+      <div id="node-health-panel" class="hidden">
+        <div class="node-health-title">API Health</div>
+        <div id="node-health-list"></div>
+      </div>
+    </div>
+
+    <div id="tab-files" class="tab-pane">
+      <div id="file-tree">
+        <div class="empty" data-i18n="loading-tree">載入 file tree⋯</div>
+      </div>
+    </div>
+
+    <div id="tab-vessel" class="tab-pane">
+      <div class="vessel-panel">
+        <div class="vessel-head">
+          <div>
+            <div class="vessel-title">Vessel State</div>
+            <div id="vessel-summary" class="vessel-subtitle">載入載具狀態⋯</div>
+          </div>
+          <button id="vessel-refresh" class="vessel-small-btn" type="button">刷新</button>
+        </div>
+
+        <section class="vessel-section">
+          <div class="vessel-section-title">Map / 位置</div>
+          <div id="vessel-map" class="vessel-map">
+            <div class="vessel-map-empty">未設定位置</div>
+          </div>
+          <div class="vessel-location-form">
+            <input id="vessel-lat" type="number" step="0.000001" placeholder="lat">
+            <input id="vessel-lon" type="number" step="0.000001" placeholder="lon">
+            <input id="vessel-place-label" type="text" placeholder="地點標籤，例如 home / lab">
+            <button id="vessel-use-browser-location" class="vessel-small-btn" type="button">用瀏覽器定位</button>
+            <button id="vessel-save-location" class="vessel-small-btn primary" type="button">保存位置</button>
+          </div>
+          <div id="vessel-location-status" class="vessel-status-line"></div>
+        </section>
+
+        <section class="vessel-section">
+          <div class="vessel-section-title">Calendar / 承諾</div>
+          <div class="vessel-event-form">
+            <input id="vessel-event-title" type="text" placeholder="事件 / 承諾">
+            <input id="vessel-event-start" type="datetime-local">
+            <button id="vessel-add-event" class="vessel-small-btn primary" type="button">加入</button>
+          </div>
+          <div id="vessel-events" class="vessel-list"></div>
+        </section>
+
+        <details class="vessel-section vessel-notes-section">
+          <summary>Notes / 系統筆記</summary>
+          <div class="vessel-note-form">
+            <input id="vessel-note-title" type="text" placeholder="標題">
+            <textarea id="vessel-note-body" rows="3" placeholder="記錄系統觀察、硬件確認、位置變化、工具狀態⋯"></textarea>
+            <button id="vessel-add-note" class="vessel-small-btn primary" type="button">新增筆記</button>
+          </div>
+          <div id="vessel-notes" class="vessel-list"></div>
+        </details>
+      </div>
+    </div>
+
+    <!-- v8.13 D5 — Unified timeline tab: all turns from all saved files, sorted by ts asc -->
+    <div id="tab-world" class="tab-pane">
+      <div class="world-panel">
+        <div class="world-head">
+          <div>
+            <div class="world-title">World Simulation</div>
+            <div id="world-summary" class="world-subtitle">Ready</div>
+          </div>
+          <button id="world-refresh" class="vessel-small-btn" type="button">Refresh</button>
+        </div>
+
+        <section class="world-section">
+          <div class="world-section-title">Simulation Input</div>
+          <textarea id="world-input" rows="3" placeholder="/world freedom, blackbox, cost"></textarea>
+          <div class="world-actions">
+            <button id="world-use-chat" class="vessel-small-btn" type="button">Use chat input</button>
+            <button id="world-run" class="vessel-small-btn primary" type="button">Simulate</button>
+            <button id="world-forecast" class="vessel-small-btn" type="button">Forecast</button>
+            <button id="world-geotimeline" class="vessel-small-btn" type="button">Geo Timeline</button>
+            <button id="world-live-news" class="vessel-small-btn" type="button" title="Fetch audited live sources, then revise the forecast">Live correction</button>
+            <button id="world-open-atlas" class="vessel-small-btn" type="button">Open Atlas</button>
+          </div>
+          <div id="world-status" class="vessel-status-line"></div>
+        </section>
+
+        <details class="world-section world-news-section">
+          <summary>Optional filtered news sources</summary>
+          <textarea id="world-news-sources" rows="4" placeholder='[{"url":"https://reuters.com/...","title":"...","text":"..."}]'></textarea>
+        </details>
+
+        <section class="world-section">
+          <div class="world-section-title">State / Geo Map</div>
+          <div class="world-map-stack">
+            <canvas id="world-canvas" class="world-canvas" width="360" height="240"></canvas>
+            <div id="world-geo-map" class="world-leaflet-map hidden" aria-label="Interactive world event map"></div>
+          </div>
+          <div id="world-time-controls" class="world-time-controls hidden">
+            <button id="world-time-play" class="world-time-play" type="button" title="Play timeline">Play</button>
+            <input id="world-time-range" type="range" min="0" max="0" value="0" aria-label="Visible timeline date">
+            <span id="world-time-label">--</span>
+          </div>
+          <div id="world-legend" class="world-legend"></div>
+        </section>
+
+        <section class="world-section">
+          <div class="world-section-title">Scenario Compare</div>
+          <div id="world-scenarios" class="world-list"></div>
+        </section>
+
+        <details class="world-section world-raw-section">
+          <summary>Raw snapshot</summary>
+          <pre id="world-raw"></pre>
+        </details>
+      </div>
+    </div>
+
+    <div id="tab-timeline" class="tab-pane">
+      <div class="timeline-filters">
+        <input type="search" id="timeline-search" placeholder="🔍 search input / council...">
+        <select id="timeline-filter-mode">
+          <option value="">all modes</option>
+          <option value="auto">auto</option>
+          <option value="firewall">firewall</option>
+          <option value="blackboxlab">blackboxlab</option>
+          <option value="scr">scr</option>
+          <option value="news">news</option>
+          <option value="sovereign">sovereign</option>
+          <option value="plain_llm">plain_llm</option>
+          <option value="trinity_only">trinity_only</option>
+          <option value="delabel_only">delabel_only</option>
+        </select>
+        <select id="timeline-filter-verdict">
+          <option value="">all verdicts</option>
+          <option value="consensus">consensus</option>
+          <option value="veto">veto</option>
+          <option value="interrupt">interrupt</option>
+        </select>
+        <button id="timeline-refresh" title="reload timeline">↻</button>
+      </div>
+      <div id="timeline-list">
+        <div class="empty">載入中⋯</div>
+      </div>
+    </div>
+
+    <!-- v8.31 — Skills tab: read-only list of skills/*/SKILL.md -->
+    <div id="tab-skills" class="tab-pane">
+      <div id="skills-list">
+        <div class="empty" data-i18n="loading-skills">載入 skills⋯</div>
+      </div>
+    </div>
+
+    <!-- Feature 3: Learning Tools Panel -->
+    <div id="tab-learn" class="tab-pane" id="learn-pane">
+      <div class="learn-toolbar">
+        <button class="learn-quick-btn" data-tool="fetch_hn" data-args='{"feed":"topstories","max_items":10,"save":true}'>
+          <i class="ti ti-news"></i> Hacker News
+        </button>
+        <button class="learn-quick-btn" data-tool="fetch_reddit" data-args='{"source":"MachineLearning","max_posts":10,"save":true}'>
+          <i class="ti ti-brand-reddit"></i> Reddit ML
+        </button>
+        <button class="learn-quick-btn" data-tool="search_arxiv" data-args='{"query":"large language models","max_results":5,"save":true}'>
+          <i class="ti ti-book"></i> arXiv
+        </button>
+      </div>
+      <div class="learn-url-row">
+        <input id="learn-url-input" placeholder="URL、RSS feed、搜索詞…" type="text">
+        <select id="learn-tool-select">
+          <option value="fetch_webpage">網頁</option>
+          <option value="fetch_rss_feed">RSS</option>
+          <option value="search_arxiv">arXiv</option>
+          <option value="fetch_reddit">Reddit</option>
+        </select>
+        <button id="learn-fetch-btn"><i class="ti ti-download"></i> 抓取</button>
+      </div>
+      <div id="learn-results"></div>
+    </div>
+
+  </aside>
+
+  <!-- Main column -->
+  <section id="main-column">
+
+    <!-- File viewer — position:absolute over #main-column when a file is opened -->
+    <div id="sidebar-viewer" class="hidden">
+      <div class="sv-header">
+        <button id="sv-back" class="sv-back" type="button" title="返回對話視圖">← 返回</button>
+        <span id="sv-path" class="sv-path"></span>
+        <span id="sv-layer-badge" class="sv-layer-badge"></span>
+        <span id="sv-dirty" class="sv-dirty"></span>
+        <button id="sv-revert" class="sv-revert" disabled type="button">還原</button>
+        <button id="sv-save" class="sv-save" disabled type="button">儲存</button>
+      </div>
+      <div id="sv-host" class="sv-host"></div>
+      <div id="sv-footer" class="sv-footer"></div>
+    </div>
+
+    <!-- Input area -->
+    <div id="input-section">
+
+      <!-- Tool toolbar (Feature 1) -->
+      <div id="tool-toolbar">
+        <span class="toolbar-label">感知</span>
+        <button class="tool-btn" id="btn-screenshot" title="截圖" aria-label="截圖"><i class="ti ti-screenshot"></i></button>
+        <button class="tool-btn" id="btn-ocr" title="OCR 讀屏" aria-label="OCR 讀屏"><i class="ti ti-scan"></i></button>
+        <button class="tool-btn" id="btn-clipboard" title="讀剪貼板" aria-label="讀剪貼板"><i class="ti ti-clipboard"></i></button>
+        <div class="toolbar-sep"></div>
+        <span class="toolbar-label">語音</span>
+        <button class="tool-btn" id="btn-mic" title="錄音識別" aria-label="錄音識別"><i class="ti ti-microphone"></i></button>
+        <button class="tool-btn" id="btn-speak" title="朗讀回覆" aria-label="朗讀回覆"><i class="ti ti-volume"></i></button>
+        <div class="toolbar-sep"></div>
+        <button class="tool-btn live-btn" id="btn-live" title="Live 對話模式" aria-label="Live 對話模式">
+          <span class="live-dot" id="live-dot"></span>
+          <span id="live-btn-label">Live</span>
+        </button>
+      </div>
+
+      <!-- Live mode panel (Feature 2) -->
+      <div id="live-mode-panel" style="display:none">
+        <div id="live-state-row">
+          <div class="live-state-dot" id="live-state-dot"></div>
+          <span id="live-state-text">就緒</span>
+          <div id="live-wave" class="live-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div id="live-lang-row">
+          <button class="lang-chip selected" data-lang="yue">廣東話</button>
+          <button class="lang-chip" data-lang="zh">普通話</button>
+          <button class="lang-chip" data-lang="en">English</button>
+        </div>
+        <div id="live-last-turn" style="font-size:12px; color:var(--text-dim)"></div>
+        <button id="btn-live-stop" class="tool-btn danger-btn">停止 Live</button>
+      </div>
+
+      <textarea id="user-input" data-i18n-placeholder="input-placeholder"
+                placeholder="輸入問題（可加 /firewall, /blackboxlab, /scr, /news, /sovereign trigger）..."
+                rows="3"></textarea>
+
+      <div class="controls">
+        <details class="ref-picker">
+          <summary data-i18n="ref-summary">📎 注入 Data Ref</summary>
+          <div class="ref-content">
+            <input type="text" id="ref-input" data-i18n-placeholder="ref-placeholder" placeholder="cau:010, experiment:011, theory:zuobiao...">
+            <div id="ref-suggestions"></div>
+            <div id="active-refs"></div>
+          </div>
+        </details>
+
+        <details class="mode-picker">
+          <summary data-i18n="mode-summary">🎯 Pipeline Modes (multi-select)</summary>
+          <div class="mode-content">
+            <div class="mode-group">
+              <div class="mode-group-label">Auto-routed</div>
+              <div class="mode-row"><label><input type="checkbox" name="mode" value="auto" checked> <span data-i18n="mode-auto">自動 (Full 8-stage, dispatcher-routed)</span></label><select class="mode-llm-pick" data-mode="auto"><option value="default">default LLM</option></select></div>
+            </div>
+            <div class="mode-group">
+              <div class="mode-group-label">Truncated · skip stages（唔可同 Combined 一齊揀）</div>
+              <div class="mode-row"><label><input type="checkbox" name="mode" value="tool_workshop"> 🔧 工具坊 (Tool Workshop · 設計 / 新增 Agent 工具)</label><select class="mode-llm-pick" data-mode="tool_workshop"><option value="default">default LLM</option></select></div>
+              <div class="mode-row sa-mode-row">
+                <label><input type="checkbox" name="mode" value="smart_auto" id="smart-auto-mode-chk"> 🧭 智能路由 (Smart Auto · 自動選最佳後端)</label>
+                <span class="sa-badge" id="smart-auto-badge">等待輸入…</span>
+              </div>
+              <div class="mode-row agent-chat-mode-row">
+                <label><input type="checkbox" name="mode" value="agent_chat" id="agent-chat-mode-chk"> 🛠 Agent 對話 (直接執行 · 自然語言控制電腦)</label>
+              </div>
+              <div class="mode-row ar-mode-row">
+                <label><input type="checkbox" name="mode" value="app_relay" id="app-relay-mode-chk"> 🖥 App 中繼 (App Relay · 發送到本機 App 並讀回回應)</label>
+                <select id="app-relay-target-select" class="ar-target-select" title="選擇目標 App">
+                  <option value="">自動 (第一個運行中的 App)</option>
+                  <option value="claude">URUK relay via Claude Desktop</option>
+                  <option value="codex">CX Codex</option>
+                  <option value="chatgpt">💬 ChatGPT Desktop</option>
+                  <option value="copilot">CP Windows Copilot</option>
+                </select>
+              </div>
+            </div>
+            <div class="mode-group">
+              <div class="mode-group-label">Full pipeline · forced mode</div>
+              <div class="mode-row"><label><input type="checkbox" name="mode" value="firewall"> /firewall</label><select class="mode-llm-pick" data-mode="firewall"><option value="default">default LLM</option></select></div>
+              <div class="mode-row"><label><input type="checkbox" name="mode" value="blackboxlab"> /blackboxlab <span title="實驗室式 7-phase 假設逆轉。Output template-formatted." style="opacity:0.6;font-size:0.85em">— 7-phase 黑盒實驗室</span></label><select class="mode-llm-pick" data-mode="blackboxlab"><option value="default">default LLM</option></select></div>
+              <div class="mode-row"><label><input type="checkbox" name="mode" value="scr"> /scr <span title="Soul Coordinate Reconstruction · 從歷史人物 verified coordinate 生成對話。SCR: EINSTEIN / NIETZSCHE / SOCRATES 啟動 profile。" style="opacity:0.6;font-size:0.85em">— 靈魂座標重組</span></label><select class="mode-llm-pick" data-mode="scr"><option value="default">default LLM</option></select></div>
+              <div class="mode-row"><label><input type="checkbox" name="mode" value="news"> /news</label><select class="mode-llm-pick" data-mode="news"><option value="default">default LLM</option></select></div>
+              <div class="mode-row"><label><input type="checkbox" name="mode" value="sovereign"> /sovereign</label><select class="mode-llm-pick" data-mode="sovereign"><option value="default">default LLM</option></select></div>
+            </div>
+            <div class="mode-group">
+              <div class="mode-group-label">Execution Strategy</div>
+              <label class="exec-strategy-row"><input type="radio" name="exec_strategy" value="parallel" checked> Parallel (N LLM calls · 每個 mode 獨立 pipeline)</label>
+              <label class="exec-strategy-row"><input type="radio" name="exec_strategy" value="combined"> Combined (1 LLM call · Stage 1-3 共用，1 個 LLM 收 meta-prompt 做晒所有 mode 嘅 Father/Son/Spirit/Council)</label>
+              <div id="combined-executor-row" class="combined-exec-row hidden">
+                <label>Combined executor LLM: <select id="combined-executor-pick"><option value="default">default LLM</option></select></label>
+              </div>
+            </div>
+            <div id="mode-warning" class="mode-warning hidden"></div>
+          </div>
+        </details>
+
+        <div class="save-control">
+          <input type="text" id="label-input" data-i18n-placeholder="label-placeholder" placeholder="標籤（選擇性）">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="save-checkbox"> <span data-i18n="save-label">儲存對話</span>
+          </label>
+          <label class="checkbox-wrap" title="開啟後，系統自動決定要唔要搜尋 / fetch URL / 查 calendar，唔需要操作者揀">
+            <input type="checkbox" id="auto-tools-checkbox"> <span data-i18n="auto-tools-label">🤖 自動工具</span>
+          </label>
+          <label class="inference-budget-control" title="控制模型 failover / retry 額外預算；唔會靜默刪除所選 pipeline 必需階段">
+            推理預算
+            <select id="inference-budget-select">
+              <option value="auto" selected>自動</option>
+              <option value="economy">節約：無額外重試</option>
+              <option value="balanced">平衡：最多 +2</option>
+              <option value="deep">深度：最多 +6</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="run-btn" data-i18n="run-btn">▶ 執行</button>
+
+        <details class="tool-drawer">
+          <summary>工具 / 設定</summary>
+          <div class="tool-palette">
+            <button class="tool-btn" id="tool-search-btn" title="Web 搜索 (DuckDuckGo)">🔍 <span data-i18n="tool-search">Search</span></button>
+            <button class="tool-btn" id="tool-fetch-btn"  title="Fetch URL 內容">🌐 <span data-i18n="tool-fetch">Fetch</span></button>
+            <button class="tool-btn" id="tool-calendar-btn" title="本地 .ics calendar 事件">📅 <span data-i18n="tool-calendar">Calendar</span></button>
+            <button class="tool-btn" id="settings-btn" title="LLM Provider / Model 設定">⚙ <span data-i18n="settings-btn">LLM 設定</span></button>
+            <button class="tool-btn" id="agent-tools-btn" title="瀏覽、修改、新增 Agent 工具">🤖 <span>工具</span></button>
+            <button class="tool-btn" id="tool-workshop-btn" title="Tool Workshop 對話模式：用對話新增 / 了解工具">🔧 <span>工具坊</span></button>
+            <button class="tool-btn" id="app-control-btn" title="控制電腦 App（URUK relay backend 等）">🖥 <span>App 控制</span></button>
+            <span class="tool-palette-hint" title="或者 ☑ 「🤖 自動工具」讓系統自動決定">💡 hint</span>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- ★ 自我升級面板 -->
+    <details id="self-upgrade-panel" class="self-upgrade-panel">
+      <summary class="self-upgrade-summary">
+        <span>⚡ 系統自我升級</span>
+        <small>審計、學習、循環升級同計劃檢視</small>
+      </summary>
+      <div class="sup-header">
+        <span class="sup-icon">⚡</span>
+        <span class="sup-title">系統自我升級</span>
+        <div class="sup-relay-wrap">
+          <label class="sup-relay-label">透過</label>
+          <select id="sup-relay-select" class="sup-relay-select">
+            <option value="claude">URUK relay via Claude Desktop</option>
+            <option value="codex">CX Codex</option>
+            <option value="claude_code">⌨️ Claude Code</option>
+            <option value="chatgpt">💬 ChatGPT Desktop</option>
+            <option value="local">🖥 本地 LLM</option>
+          </select>
+        </div>
+      </div>
+      <div id="sup-runtime-strip" class="sup-runtime-strip">
+        <span>Port --</span>
+        <span>Code --</span>
+        <span>Relay --</span>
+        <span>Plan --</span>
+        <span>Health --</span>
+      </div>
+      <div id="sup-stability-strip" class="sup-stability-strip muted">
+        <span id="sup-stability-main">Stability --</span>
+        <span id="sup-stability-meta">未檢查</span>
+        <span id="sup-stability-path">report --</span>
+      </div>
+      <div id="sup-prompt-strip" class="sup-prompt-strip muted">
+        <span id="sup-prompt-main">Prompt --</span>
+        <span id="sup-prompt-meta">未檢查</span>
+        <span id="sup-prompt-path">baseline --</span>
+      </div>
+      <div class="sup-buttons">
+        <button id="sup-audit-btn" class="sup-btn sup-btn-audit" title="掃描系統同對話記錄，識別缺陷，生成升級建議">
+          🔍 <span>缺陷審計升級</span>
+          <small>掃描系統 + 對話 → 識別缺口 → 建議新工具</small>
+        </button>
+        <button id="sup-learn-btn" class="sup-btn sup-btn-learn" title="上網搜索最新功能，學習並升級系統">
+          🌐 <span>互聯網學習升級</span>
+          <small>搜索最新技術 → 對比現有工具 → 補充缺失功能</small>
+        </button>
+        <button id="sup-loop-btn" class="sup-btn sup-btn-loop" title="持續循環 audit/learn，直到按下暫停">
+          ♻ <span>循環自我升級</span>
+          <small>audit → learn → 重複尋找修復路線</small>
+        </button>
+        <button id="sup-pause-btn" class="sup-btn sup-btn-pause" title="完成當前升級工作後暫停，不會即時中斷">
+          ⏸ <span>完成當前後暫停</span>
+          <small>不殺當前任務；下一輪前停低</small>
+        </button>
+      </div>
+      <div id="sup-status" class="sup-status hidden"></div>
+      <div id="sup-result" class="sup-result hidden">
+        <div class="sup-result-header">
+          <span id="sup-result-title">升級建議</span>
+          <button id="sup-result-close" class="sup-result-close">×</button>
+        </div>
+        <pre id="sup-result-body" class="sup-result-body"></pre>
+        <div id="sup-install-actions" class="sup-install-actions hidden">
+          <button id="sup-send-to-input" class="sup-action-btn">📋 發送到輸入欄處理</button>
+        </div>
+      </div>
+      <div id="sup-log-strip" class="sup-log-strip hidden"></div>
+      <div id="sup-plan-viewer" class="sup-plan-viewer">
+        <div class="sup-plan-viewer-header">
+          <span>升級計劃檢視器</span>
+          <button id="sup-stability-check" class="sup-plan-refresh" type="button" title="快速跑 deterministic stability harness">Stability</button>
+          <button id="sup-prompt-check" class="sup-plan-refresh" type="button" title="檢查 prompt/protocol baseline drift">Prompt</button>
+          <button id="sup-report-btn" class="sup-plan-refresh" type="button" title="生成 self-upgrade JSON + Markdown 報告">生成報告</button>
+          <button id="sup-gate-check" class="sup-plan-refresh" type="button" title="只讀檢查：knowledge audit、coordinate benchmark、quick_eval">硬閘檢查</button>
+          <button id="sup-plan-refresh" class="sup-plan-refresh" type="button">刷新</button>
+        </div>
+        <div id="sup-plan-list" class="sup-plan-list">
+          <div class="sup-plan-empty">尚未載入計劃</div>
+        </div>
+        <div id="sup-plan-detail" class="sup-plan-detail hidden"></div>
+      </div>
+    </details>
+
+    <!-- v8.4 — Cross-session memory banner (one-shot Detach + View) -->
+    <div id="cross-session-banner" class="hidden">
+      <span class="cs-banner-icon">🔗</span>
+      <span class="cs-banner-text" id="cs-banner-text">Continuing from prior sessions</span>
+      <span class="cs-banner-spacer"></span>
+      <button id="cs-banner-view" class="cs-banner-btn" title="Open session-history sidebar tab to see attached sessions">View</button>
+      <button id="cs-banner-detach" class="cs-banner-btn" title="Skip history for next query (one-shot)">Detach</button>
+    </div>
+
+    <!-- v8.11 — In-session conversation thread (past turns, scrollable, collapsible).
+         New turns stream into the workspace below (#workspace-input-echo +
+         #dispatch-row + #nodes-grid + #multi-mode-stack); when `done` fires,
+         the workspace is snapshotted into a new article inside #conv-thread
+         and the workspace resets for the next query. -->
+    <div id="conv-thread" class="conv-thread"></div>
+    <div id="conv-truncation-warning" class="conv-truncation-warning hidden"></div>
+
+    <!-- v8.11 — Current turn input echo (set at runTrinity start; snapshotted into thread on done) -->
+    <div id="workspace-input-echo" class="workspace-input-echo hidden"></div>
+
+    <details id="inference-panel" class="inference-panel hidden">
+      <summary>
+        模型調用 · <strong id="inference-summary">等待路由</strong>
+      </summary>
+      <div class="inference-body">
+        <div class="inference-metrics">
+          <div><span>計劃</span><strong id="inference-planned">--</strong></div>
+          <div><span>硬上限</span><strong id="inference-limit">--</strong></div>
+          <div><span>實際請求</span><strong id="inference-actual">0</strong></div>
+          <div><span>獨立模型</span><strong id="inference-unique">0</strong></div>
+        </div>
+        <div id="inference-reason" class="inference-reason"></div>
+        <div id="inference-call-list" class="inference-call-list"></div>
+      </div>
+    </details>
+
+    <!-- v8.10 — Multi-mode unified stack (replaces v8.8 tab-bar approach).
+         When ≥2 modes selected, all per-mode sections clone into this container
+         and stack vertically. Legacy #dispatch-row + #nodes-grid are hidden in
+         multi-mode (handled via JS .multi-mode-hidden class).
+         Single-mode (≤1) bypasses this container entirely — legacy DOM stays. -->
+    <div id="multi-mode-stack" class="multi-mode-stack"></div>
+
+    <!-- Dispatch row -->
+    <div id="dispatch-row" class="hidden" data-base-id="dispatch-row">
+      <div class="dispatch-card">
+        <div class="dispatch-label" data-i18n="dispatch-label">⟶ DISPATCH</div>
+        <div class="dispatch-body">
+          <div><strong data-i18n="dispatch-mode">Mode:</strong> <span id="dispatch-mode" data-base-id="dispatch-mode">—</span></div>
+          <div><strong data-i18n="dispatch-rationale">Rationale:</strong> <span id="dispatch-rationale" data-base-id="dispatch-rationale">—</span></div>
+          <div><strong data-i18n="dispatch-refs">References:</strong> <span id="dispatch-refs" data-base-id="dispatch-refs">—</span></div>
+          <div><strong data-i18n="dispatch-cost">Cost:</strong> <span id="dispatch-cost" data-base-id="dispatch-cost">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Knowledge operating layer: manifest/RAG/trace visibility for the active turn. -->
+    <details id="knowledge-panel" class="stage-pane knowledge-panel hidden" data-base-id="knowledge-panel">
+      <summary>
+        Knowledge Plane · <span id="knowledge-status" data-base-id="knowledge-status">waiting</span>
+        · <span id="knowledge-rag-count" data-base-id="knowledge-rag-count">RAG --</span>
+      </summary>
+      <div class="knowledge-body">
+        <div class="knowledge-metrics">
+          <div class="knowledge-metric"><span>Manifest</span><strong id="knowledge-manifest" data-base-id="knowledge-manifest">--</strong></div>
+          <div class="knowledge-metric"><span>Issues</span><strong id="knowledge-issues-count" data-base-id="knowledge-issues-count">--</strong></div>
+          <div class="knowledge-metric"><span>CAU Structure</span><strong id="knowledge-cau" data-base-id="knowledge-cau">--</strong></div>
+          <div class="knowledge-metric"><span>Trace</span><strong id="knowledge-trace-count" data-base-id="knowledge-trace-count">0</strong></div>
+        </div>
+        <div id="knowledge-issues" class="knowledge-issues" data-base-id="knowledge-issues"></div>
+        <div id="knowledge-trace-list" class="knowledge-trace-list" data-base-id="knowledge-trace-list"></div>
+      </div>
+    </details>
+
+    <!-- v8.14 BN — Browser Audit (sources + coords, /news + URL-aware modes) -->
+    <details id="browser-audit-section" class="stage-pane hidden" data-base-id="browser-audit-section">
+      <summary>🌐 Browser audit · <span id="browser-audit-counter" data-base-id="browser-audit-counter">0 sources</span></summary>
+      <div id="browser-audit-list" class="browser-audit-list" data-base-id="browser-audit-list"></div>
+      <div id="browser-audit-summary" class="browser-audit-summary" data-base-id="browser-audit-summary"></div>
+    </details>
+
+    <!-- v8.26 UX-Collapse-2 — Stage 1 去標籤化 streaming surface -->
+    <details id="stage1-section" class="stage-pane hidden" open data-base-id="stage1-section">
+      <summary>🏷 去標籤化 (Stage 1 · De-labeling)</summary>
+      <div class="stage1-grid">
+        <div class="stage1-cell"><div class="stage1-cell-label">delabeled_input</div>
+          <pre id="stage1-delabeled" class="stage1-cell-output" data-base-id="stage1-delabeled"></pre></div>
+        <div class="stage1-cell"><div class="stage1-cell-label">detected_labels</div>
+          <pre id="stage1-labels" class="stage1-cell-output" data-base-id="stage1-labels"></pre></div>
+        <div class="stage1-cell"><div class="stage1-cell-label">veto / interrupt</div>
+          <pre id="stage1-flags" class="stage1-cell-output" data-base-id="stage1-flags"></pre></div>
+      </div>
+    </details>
+
+    <!-- v8.14 Q1 — Stage 2 解釋層 (Module O · canonical 四律 + 哲學貫穿律) surface, collapsible
+         v8.26 UX-Collapse-2 — now `open` by default during streaming
+         v8.30 p6 — aligned to EXPLANATION_LAYER.md v7.2:
+                    · 律一 地理 (Geography: Ceiling & Floor)
+                    · 律二 宗教 (Religion: Code Encapsulation)
+                    · 律三 心理 (Psychology: Kinetic Energy) — was missing
+                    · 律四 歷史 (History: System Log)         — was missing
+                    · 貫穿律 哲學 (Philosophy: Assembly Language, meta)
+                    Pre-fix UI used 八律 numbering (律六/七/八) by mistake. -->
+    <details id="stage2-section" class="stage-pane hidden" open data-base-id="stage2-section">
+      <summary>⚖ 解釋層 (Stage 2 · 四律 + 貫穿律 / Module O)</summary>
+      <div class="stage2-grid" id="stage2-grid" data-base-id="stage2-grid">
+        <div class="stage2-cell"><div class="stage2-cell-label">律一 · 地理（賽道設計）</div>
+          <pre class="stage2-cell-output" id="stage2-geography" data-base-id="stage2-geography"></pre></div>
+        <div class="stage2-cell"><div class="stage2-cell-label">律二 · 宗教（代碼封裝）</div>
+          <pre class="stage2-cell-output" id="stage2-religion" data-base-id="stage2-religion"></pre></div>
+        <div class="stage2-cell"><div class="stage2-cell-label">律三 · 心理（壓力閥）</div>
+          <pre class="stage2-cell-output" id="stage2-psychology" data-base-id="stage2-psychology"></pre></div>
+        <div class="stage2-cell"><div class="stage2-cell-label">律四 · 歷史（運行日誌）</div>
+          <pre class="stage2-cell-output" id="stage2-history" data-base-id="stage2-history"></pre></div>
+        <div class="stage2-cell"><div class="stage2-cell-label">貫穿律 · 哲學（meta 調度）</div>
+          <pre class="stage2-cell-output" id="stage2-philosophy" data-base-id="stage2-philosophy"></pre></div>
+        <div class="stage2-cell"><div class="stage2-cell-label">因果摘要 (causal_summary)</div>
+          <pre class="stage2-cell-output" id="stage2-causal" data-base-id="stage2-causal"></pre></div>
+      </div>
+    </details>
+
+    <!-- v8.5x Trinity Redesign: compact streaming status bar -->
+    <div class="trinity-status-bar" id="trinity-status-bar"></div>
+
+    <!-- v8.25 UX-Collapse — Single answer bubble (primary display, shown after `done`).
+         Moved above #nodes-grid so the answer is seen first when both are visible.
+         On `done`, JS copies council fusion text here and collapses the grid. -->
+    <div id="council-answer-bubble" class="council-answer-bubble hidden" data-base-id="council-answer-bubble">
+      <div id="council-answer-chips" class="council-answer-chips" data-base-id="council-answer-chips"></div>
+      <div id="council-answer-body" class="council-answer-body" data-base-id="council-answer-body"></div>
+      <button id="trinity-breakdown-toggle" class="trinity-breakdown-toggle" data-base-id="trinity-breakdown-toggle" type="button"
+              aria-expanded="false" title="Toggle full pipeline breakdown (Stage 1 去標籤 / Stage 2 四律 / Stage 4 Trinity 4-panel + verdict chips)">
+        ▸ <span data-i18n="pipeline-breakdown-show">內部質控 / 完整流程 (Stage 1-4)</span>
+      </button>
+    </div>
+
+    <!-- v8.5x: standalone Trinity toggle row (shown after done, hidden during streaming) -->
+    <button id="trinity-toggle-row" type="button" aria-expanded="false">展開三位一體 ▸</button>
+
+    <!-- Agentic tool results bar (Stage 0.5) -->
+    <div id="tool-results-bar" style="display:none"></div>
+
+    <!-- 4 node panels — hidden by default (trinity-collapsed); revealed via toggle -->
+    <div id="nodes-grid" class="trinity-collapsed" data-base-id="nodes-grid">
+      <div class="node-panel" data-role="father">
+        <div class="node-header">
+          <span class="node-icon">⊕</span>
+          <h3 data-i18n="node-father">聖父</h3>
+          <span class="node-meta" id="meta-father" data-base-id="meta-father">—</span>
+        </div>
+        <div class="node-output" id="output-father" data-base-id="output-father">
+          <div class="placeholder" data-i18n="node-waiting">等待中⋯</div>
+        </div>
+      </div>
+
+      <div class="node-panel" data-role="son">
+        <div class="node-header">
+          <span class="node-icon">○</span>
+          <h3 data-i18n="node-son">聖子</h3>
+          <span class="node-meta" id="meta-son" data-base-id="meta-son">—</span>
+        </div>
+        <div class="node-output" id="output-son" data-base-id="output-son">
+          <div class="placeholder" data-i18n="node-waiting">等待中⋯</div>
+        </div>
+      </div>
+
+      <div class="node-panel" data-role="spirit">
+        <div class="node-header">
+          <span class="node-icon">⟁</span>
+          <h3 data-i18n="node-spirit">聖靈</h3>
+          <span class="node-meta" id="meta-spirit" data-base-id="meta-spirit">—</span>
+        </div>
+        <div class="node-output" id="output-spirit" data-base-id="output-spirit">
+          <div class="placeholder" data-i18n="node-waiting">等待中⋯</div>
+        </div>
+      </div>
+
+      <div class="node-panel council" data-role="council">
+        <div class="node-header">
+          <span class="node-icon">⟴</span>
+          <h3 data-i18n="node-council">會議整合</h3>
+          <span class="node-meta" id="meta-council" data-base-id="meta-council">—</span>
+        </div>
+        <div class="node-output" id="output-council" data-base-id="output-council">
+          <div class="placeholder" data-i18n="council-waiting">等待 3 節點先⋯</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coordinate visualization + Civilizational Clock simulator -->
+    <details id="viz-panel" class="viz-panel-details">
+      <summary class="viz-panel-summary">
+        <span>座標視覺化 + 文明時鐘</span>
+        <span class="viz-panel-tabs">
+          <button class="viz-tab active" data-tab="coord" type="button">3D 座標圖</button>
+          <button class="viz-tab" data-tab="clock" type="button">文明時鐘</button>
+        </span>
+      </summary>
+      <div id="viz-coord-pane" class="viz-pane active">
+        <div id="coord-map-container" style="min-height:200px">
+          <div class="viz-placeholder">完成一次分析後自動渲染座標圖</div>
+        </div>
+      </div>
+      <div id="viz-clock-pane" class="viz-pane" style="display:none">
+        <div class="viz-clock-controls">
+          <label>協議部署速度 <input type="range" id="clock-speed" min="0.05" max="1" step="0.05" value="0.3"> <span id="clock-speed-val">0.3</span></label>
+          <label>LIE_COST <input type="range" id="clock-lie" min="1" max="15" step="0.1" value="5.85"> <span id="clock-lie-val">5.85</span></label>
+          <button id="clock-run-btn" type="button">模擬</button>
+        </div>
+        <div id="clock-results"></div>
+      </div>
+    </details>
+
+    <!-- Agent Chat output panel (agent_chat mode + Trinity→Tool bridge results) -->
+    <div id="agent-chat-panel" class="agent-chat-panel hidden">
+      <div class="agent-chat-header">
+        <span class="agent-chat-icon">🛠</span>
+        <span class="agent-chat-title">Agent 執行</span>
+        <span class="agent-chat-status" id="agent-chat-status">等待指令…</span>
+        <button class="agent-chat-clear" id="agent-chat-clear" type="button">✕ 清除</button>
+      </div>
+      <div class="agent-chat-steps" id="agent-chat-steps"></div>
+    </div>
+
+    <!-- Editor pane (FT-2: file customization) -->
+    <div id="editor-pane" class="editor-pane hidden">
+      <div class="editor-header">
+        <span class="editor-path" id="editor-path">—</span>
+        <span class="editor-layer-badge" id="editor-layer-badge">—</span>
+        <span class="editor-dirty" id="editor-dirty"></span>
+        <span class="editor-spacer"></span>
+        <button id="editor-save" disabled data-i18n="editor-save">儲存</button>
+        <button id="editor-revert" disabled data-i18n="editor-revert">還原</button>
+        <button id="editor-close" data-i18n="editor-close">×</button>
+      </div>
+      <div id="editor-host"></div>
+      <div class="editor-footer" id="editor-footer">
+        <span id="editor-status">—</span>
+      </div>
+    </div>
+
+    <!-- Status footer -->
+    <div id="status-bar">
+      <span id="status-text" data-i18n="status-ready">就緒</span>
+      <span id="status-spinner" class="hidden">⋯</span>
+    </div>
+  </section>
+</main>
+
+<dialog id="world-atlas-dialog" class="world-atlas-dialog">
+  <div class="world-atlas-shell">
+    <header class="world-atlas-header">
+      <div>
+        <div class="world-atlas-eyebrow">URUK WORLD MODEL</div>
+        <h2>Geo-Temporal Atlas</h2>
+        <div id="world-atlas-summary" class="world-atlas-summary">Run Geo Timeline to load evidence.</div>
+      </div>
+      <div class="world-atlas-header-actions">
+        <button id="world-atlas-fit" class="world-atlas-btn" type="button">Fit evidence</button>
+        <button id="world-atlas-close" class="world-atlas-close" type="button" aria-label="Close Atlas">Close</button>
+      </div>
+    </header>
+
+    <div class="world-atlas-toolbar">
+      <label><input id="world-layer-history" type="checkbox" checked> History</label>
+      <label><input id="world-layer-news" type="checkbox" checked> News</label>
+      <label><input id="world-layer-projected" type="checkbox" checked> Projection</label>
+      <label><input id="world-layer-links" type="checkbox" checked> Causal links</label>
+      <span class="world-atlas-toolbar-spacer"></span>
+      <input id="world-atlas-search" type="search" placeholder="Filter events">
+    </div>
+
+    <div class="world-atlas-body">
+      <section class="world-atlas-map-pane">
+        <div id="world-atlas-map" class="world-atlas-map" aria-label="Full interactive world event map"></div>
+        <div id="world-atlas-map-status" class="world-atlas-map-status">Real coordinates · future nodes are projections</div>
+        <div class="world-atlas-timebar">
+          <button id="world-atlas-play" class="world-atlas-btn" type="button">Play</button>
+          <span id="world-atlas-date-start">--</span>
+          <input id="world-atlas-time-range" type="range" min="0" max="0" value="0" aria-label="Atlas visible timeline date">
+          <span id="world-atlas-date-end">--</span>
+          <strong id="world-atlas-date-current">--</strong>
+        </div>
+      </section>
+
+      <aside class="world-atlas-inspector">
+        <section class="world-atlas-inspector-section">
+          <div class="world-atlas-section-title">Selected coordinate</div>
+          <div id="world-atlas-event-detail" class="world-atlas-event-detail">Select a point or timeline event.</div>
+        </section>
+        <section class="world-atlas-inspector-section">
+          <div class="world-atlas-section-title">Forecast revision</div>
+          <div id="world-atlas-correction" class="world-atlas-correction"></div>
+        </section>
+        <details class="world-atlas-inspector-section world-atlas-revisions">
+          <summary>Revision ledger</summary>
+          <div id="world-atlas-revision-list"></div>
+        </details>
+        <section class="world-atlas-inspector-section world-atlas-timeline-section">
+          <div class="world-atlas-section-title">Timeline</div>
+          <div id="world-atlas-timeline" class="world-atlas-timeline"></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+</dialog>
+
+
+<!-- ═══════ Phase 1 Tool Modals ═══════ -->
+
+<div id="tool-search-modal" class="tool-modal hidden">
+  <div class="tool-modal-content">
+    <div class="tool-modal-header">
+      <h3>🔍 Web 搜索</h3>
+      <button class="tool-modal-close" data-modal="tool-search-modal">×</button>
+    </div>
+    <div class="tool-modal-body">
+      <div class="tool-input-row">
+        <input type="text" id="tool-search-query" placeholder="搜索詞..." />
+        <input type="number" id="tool-search-n" min="1" max="20" value="5" title="結果數" />
+        <button id="tool-search-go" class="tool-go-btn">搜索</button>
+      </div>
+      <div id="tool-search-results" class="tool-results"></div>
+    </div>
+    <div class="tool-modal-footer">
+      <button id="tool-search-insert" disabled>📎 插入 prompt</button>
+      <button id="tool-search-insert-run" disabled>🚀 搜索 + 執行</button>
+    </div>
+  </div>
+</div>
+
+<div id="tool-fetch-modal" class="tool-modal hidden">
+  <div class="tool-modal-content">
+    <div class="tool-modal-header">
+      <h3>🌐 Fetch URL</h3>
+      <button class="tool-modal-close" data-modal="tool-fetch-modal">×</button>
+    </div>
+    <div class="tool-modal-body">
+      <div class="tool-input-row">
+        <input type="url" id="tool-fetch-url" placeholder="https://example.com/article" />
+        <button id="tool-fetch-go" class="tool-go-btn">Fetch</button>
+      </div>
+      <div id="tool-fetch-result" class="tool-results"></div>
+    </div>
+    <div class="tool-modal-footer">
+      <button id="tool-fetch-insert" disabled>📎 插入 prompt</button>
+    </div>
+  </div>
+</div>
+
+<div id="tool-calendar-modal" class="tool-modal hidden">
+  <div class="tool-modal-content">
+    <div class="tool-modal-header">
+      <h3>📅 Calendar 事件</h3>
+      <button class="tool-modal-close" data-modal="tool-calendar-modal">×</button>
+    </div>
+    <div class="tool-modal-body">
+      <div class="tool-input-row">
+        <select id="tool-cal-file">
+          <option value="">— 揀 .ics 檔 —</option>
+        </select>
+        <input type="date" id="tool-cal-from" title="從" />
+        <input type="date" id="tool-cal-to" title="至" />
+        <button id="tool-cal-go" class="tool-go-btn">查詢</button>
+      </div>
+      <div id="tool-cal-result" class="tool-results"></div>
+    </div>
+    <div class="tool-modal-footer">
+      <button id="tool-cal-insert" disabled>📎 插入 prompt</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════ Settings Modal (Phase 3 Fix-3: LLM Provider UI) ═══════ -->
+
+<div id="settings-modal" class="tool-modal hidden">
+  <div class="tool-modal-content settings-modal-content">
+    <div class="tool-modal-header">
+      <h3>⚙ LLM Provider 設定</h3>
+      <button class="tool-modal-close" data-modal="settings-modal">×</button>
+    </div>
+
+    <div class="tool-modal-body">
+      <section id="settings-presets">
+        <div class="settings-section-label">Quick presets（一 click 切換 8 nodes）：</div>
+        <div id="settings-preset-buttons"></div>
+        <div id="settings-preset-desc" class="settings-preset-desc"></div>
+      </section>
+
+      <section id="settings-key-status">
+        <div class="settings-section-label">.env API keys 狀態（值唔顯示）：</div>
+        <div id="settings-key-list"></div>
+        <div class="settings-key-help">
+          要改 key value？點 <strong>Files tab → config/.env</strong> 用 editor 改，跟住返呢度 Save。
+        </div>
+      </section>
+
+      <section id="settings-nodes-section">
+        <div class="settings-section-label">8 Nodes 詳細配置（advanced）：</div>
+        <div id="settings-nodes-table-wrap">
+          <table id="settings-nodes-table">
+            <thead><tr>
+              <th>Node</th>
+              <th>Provider</th>
+              <th>Model</th>
+              <th>API Base</th>
+              <th>Key Env</th>
+              <th>Temp</th>
+              <th>Max Tok</th>
+              <th title="Per-node fallback profiles (overrides global chain). Comma-separated.">Fallback</th>
+            </tr></thead>
+            <tbody id="settings-nodes-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- v8.2: api_profiles editor + global chain -->
+      <section id="settings-failover-section">
+        <div class="settings-section-label">🔌 API Profiles（命名好嘅 provider+endpoint+key 組合）：</div>
+        <div id="settings-profiles-table-wrap">
+          <table id="settings-profiles-table">
+            <thead><tr>
+              <th title="Enabled = available in failover chain. Uncheck to keep config but pause from chain.">✓</th>
+              <th>Name</th>
+              <th>Provider</th>
+              <th>API Base</th>
+              <th>Key Env</th>
+              <th>Default Model</th>
+              <th>Action</th>
+            </tr></thead>
+            <tbody id="settings-profiles-tbody"></tbody>
+          </table>
+        </div>
+        <button id="settings-profile-add" class="settings-profile-add-btn" title="Add a custom provider: name + provider type + base URL + env var name + model">+ Add custom provider</button>
+
+        <div class="settings-section-label" style="margin-top: 18px;">🔗 Cross-Session Memory（自動載最近 N session 入 dispatcher prompt）：</div>
+        <div id="settings-cross-session" class="settings-cross-session">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="cs-enabled"> Auto-attach recent sessions
+          </label>
+          <label>N (1-10):
+            <input type="number" id="cs-n-recent" min="1" max="10" value="3" class="settings-input settings-num">
+          </label>
+          <label>Mode:</label>
+          <label class="cs-mode-radio"><input type="radio" name="cs-mode" value="summary" checked> Summary</label>
+          <label class="cs-mode-radio"><input type="radio" name="cs-mode" value="full"> Full transcript</label>
+          <label class="cs-mode-radio"><input type="radio" name="cs-mode" value="both"> Both</label>
+        </div>
+
+        <div class="settings-section-label" style="margin-top: 18px;">⛓ Global Failover Chain（試完主 profile 之後嘅順序）：</div>
+        <div id="settings-chain-wrap" class="settings-chain-wrap">
+          <ol id="settings-chain-list" class="settings-chain-list"></ol>
+          <div class="settings-chain-controls">
+            <label class="checkbox-wrap"><input type="checkbox" id="settings-failover-enabled"> Failover enabled</label>
+            <label>Cooldown (s): <input type="number" id="settings-cooldown" min="5" max="3600" value="300" class="settings-input settings-num"></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- v8.2: live health panel -->
+      <section id="settings-health-section">
+        <div class="settings-section-label">💓 Health Status（per profile, live polling）：</div>
+        <div id="settings-health-grid" class="settings-health-grid"></div>
+      </section>
+
+      <!-- v8.7: developer mode (client-only, localStorage) -->
+      <section id="settings-developer-section">
+        <div class="settings-section-label">🛠 Developer Mode（client-only · localStorage）：</div>
+        <label class="checkbox-wrap">
+          <input type="checkbox" id="developer-mode-toggle">
+          展開 Spirit raw metadata + 顯示 trigger_mode = NONE 嘅 chip（debug 用）
+        </label>
+      </section>
+
+      <!-- v8.15 MS-2: Source Coordinate Registry CRUD -->
+      <section id="settings-source-registry-section">
+        <div class="settings-section-label">🌐 Source Coordinate Registry（域名 → 座標 + rating）：</div>
+        <div class="sr-controls">
+          <input type="text" id="sr-filter" placeholder="filter domain..." class="settings-input" style="flex:1;min-width:140px">
+          <button id="sr-add-btn" class="settings-save-btn" type="button">+ Add</button>
+          <button id="sr-import-btn" type="button">Import JSON</button>
+          <button id="sr-export-btn" type="button">Export JSON</button>
+          <button id="sr-reset-btn" type="button" title="Clear overlay (revert to default seed)">Reset overlay</button>
+          <input type="file" id="sr-import-file" accept="application/json" hidden>
+        </div>
+        <div id="sr-status" class="sr-status"></div>
+        <div id="sr-table-wrap" class="sr-table-wrap">
+          <table id="sr-table" class="sr-table">
+            <thead><tr>
+              <th>Domain</th><th>Coordinate</th><th>Rating</th><th>Origin</th><th></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- v8.15 MS-1: Search engines availability -->
+      <section id="settings-search-engines-section">
+        <div class="settings-section-label">🔍 Search engines（BrowserNode multi-engine fan-out）：</div>
+        <div id="search-engines-grid" class="search-engines-grid"></div>
+        <div class="settings-key-help">
+          API keys 從 env 讀（BRAVE_SEARCH_API_KEY / BING_SEARCH_API_KEY / GOOGLE_API_KEY+GOOGLE_CSE_ID / TAVILY_API_KEY / SERPER_API_KEY）。
+          冇 key 嘅 engine 自動 skip — 純 DuckDuckGo Lite 行為（默認）。
+        </div>
+      </section>
+
+      <!-- v8.46: Local LLM Discovery -->
+      <section id="settings-local-llm-section">
+        <div class="settings-section-label">🖥 本機 LLM 應用（自動發現 + 直接連接）：</div>
+        <div class="llm-scan-controls">
+          <button id="llm-scan-btn" class="llm-scan-btn">🔍 掃描本機模型</button>
+          <span id="llm-scan-status" class="llm-status"></span>
+        </div>
+        <div id="llm-apps-grid" class="llm-apps-grid">
+          <div class="llm-empty">點「掃描本機模型」自動偵測 Ollama / LM Studio / Jan / KoboldCpp 等應用</div>
+        </div>
+      </section>
+
+      <!-- v8.47: Claude API Direct Connect -->
+      <section id="settings-claude-section">
+        <div class="settings-section-label">🤖 Claude API 直接連接：</div>
+        <div id="claude-status-bar" class="claude-status-bar">
+          <span id="claude-status-dot" class="claude-dot offline" title="未連接">●</span>
+          <span id="claude-status-text" class="claude-status-text">未配置 API Key</span>
+          <button id="claude-chat-btn" class="claude-chat-open-btn hidden" title="直接同 Claude 對話">💬 對話</button>
+          <button id="claude-disconnect-btn" class="claude-disconnect-btn hidden" title="清除 API Key">斷線</button>
+        </div>
+        <div id="claude-connect-form" class="claude-connect-form">
+          <div class="claude-key-row">
+            <input type="password" id="claude-key-input" class="claude-key-input"
+                   placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false">
+            <button id="claude-key-toggle" class="claude-key-toggle" title="顯示/隱藏">👁</button>
+          </div>
+          <div class="claude-model-row">
+            <label class="claude-model-label">模型：</label>
+            <select id="claude-model-select" class="claude-model-select">
+              <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+              <option value="claude-opus-4-6">claude-opus-4-6</option>
+              <option value="claude-haiku-4-5-20251001">claude-haiku-4-5</option>
+              <option value="claude-3-5-sonnet-20241022">claude-3-5-sonnet</option>
+              <option value="claude-3-5-haiku-20241022">claude-3-5-haiku</option>
+            </select>
+          </div>
+          <button id="claude-connect-btn" class="claude-connect-btn">🔗 連接 Claude</button>
+          <span id="claude-connect-status" class="claude-connect-status"></span>
+        </div>
+        <div class="settings-key-help">
+          Key 只存喺本機 config/.env，唔上傳。連接後可以喺主介面直接同 Claude 對話（唔經 Trinity pipeline）。
+        </div>
+      </section>
+
+      <!-- v8.11: in-session conversation history (client-only, refresh = reset) -->
+      <section id="settings-conv-history-section">
+        <div class="settings-section-label">💬 In-Session Conversation History（refresh = reset）：</div>
+        <label class="checkbox-wrap">
+          <input type="checkbox" id="conv-history-enabled" checked>
+          注入對話歷史落 dispatcher prompt（每次 query 帶最近 N turn）
+        </label>
+        <label>N turns (1-20):
+          <input type="number" id="conv-history-n" min="1" max="20" value="5" class="settings-input settings-num">
+        </label>
+        <button id="conv-history-clear" class="conv-history-clear-btn">🗑 Clear conversation history</button>
+        <div id="conv-history-status" class="conv-history-status"></div>
+      </section>
+
+      <div id="settings-error" class="settings-error hidden"></div>
+      <div id="settings-status" class="settings-status hidden"></div>
+    </div>
+
+    <div class="tool-modal-footer">
+      <button id="settings-save" class="settings-save-btn">💾 儲存 + 即時 reload</button>
+      <button id="settings-reload-only">🔄 Reload only (從 disk)</button>
+      <button class="tool-modal-close" data-modal="settings-modal">取消</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════ Stress Test Modal (v8.2) ═══════ -->
+
+<div id="stress-modal" class="tool-modal hidden">
+  <div class="tool-modal-content stress-modal-content">
+    <div class="tool-modal-header">
+      <h3>🔥 Stress Test (failover verification)</h3>
+      <button class="tool-modal-close" data-modal="stress-modal">×</button>
+    </div>
+    <div class="tool-modal-body">
+      <div class="stress-controls">
+        <label>Target: <select id="stress-target">
+          <option value="llm_node" selected>LLM Node (backend, call_node direct)</option>
+          <option value="pipeline">Full /api/stream — /echo short-circuit (no LLM)</option>
+          <option value="skill_tool">Skill + Tool dispatch — /skill stress_echo (no LLM, no network)</option>
+        </select></label>
+      </div>
+      <!-- LLM-node target controls -->
+      <div class="stress-controls" id="stress-controls-llm">
+        <label>Node: <select id="stress-role">
+          <option value="dispatcher" selected>dispatcher (cheap)</option>
+          <option value="delabeling">delabeling</option>
+          <option value="explanation">explanation</option>
+          <option value="filter">filter</option>
+          <option value="father">father</option>
+          <option value="son">son</option>
+          <option value="spirit">spirit</option>
+          <option value="council">council (expensive)</option>
+        </select></label>
+        <label>Mode: <select id="stress-mode">
+          <option value="mock_quota" selected>mock_quota (inject fake 429 — safe)</option>
+          <option value="live">live (real API — uses quota)</option>
+        </select></label>
+        <label>N requests: <input type="number" id="stress-n" min="1" max="50" value="5"></label>
+        <label>Concurrency: <input type="number" id="stress-concurrency" min="1" max="10" value="3"></label>
+        <!-- v8.5 — temporarily shorten cooldown for stress run so chain
+             candidates recover within the test window. Restored after run. -->
+        <label class="checkbox-wrap"><input type="checkbox" id="stress-cooldown-override-enable"> Override cooldown</label>
+        <label>Cooldown (s): <input type="number" id="stress-cooldown-override-value" min="0" max="600" value="5" disabled style="width: 60px"></label>
+      </div>
+      <!-- Pipeline (browser-driven) target controls -->
+      <div class="stress-controls hidden" id="stress-controls-pipeline">
+        <label>Prompt: <input type="text" id="stress-pipeline-prompt" value="ping" style="width:120px"></label>
+        <label>N requests: <input type="number" id="stress-pipeline-n" min="1" max="200" value="20"></label>
+        <label>Concurrency: <input type="number" id="stress-pipeline-concurrency" min="1" max="50" value="10" title="50 = browser-side cap"></label>
+        <span class="api-popover-help" style="font-size:0.78em">每個 request 變 <code>/echo {prompt}</code>，server 喺 Pre-Stage A 短路返回，唔燒 LLM。</span>
+      </div>
+      <!-- Skill+Tool (browser-driven) target controls -->
+      <div class="stress-controls hidden" id="stress-controls-skill">
+        <label>Skill: <select id="stress-skill-name">
+          <option value="stress_echo" selected>stress_echo (no-op, default)</option>
+        </select></label>
+        <label>Input: <input type="text" id="stress-skill-input" value="ping" style="width:120px"></label>
+        <label>N requests: <input type="number" id="stress-skill-n" min="1" max="200" value="20"></label>
+        <label>Concurrency: <input type="number" id="stress-skill-concurrency" min="1" max="50" value="10"></label>
+        <span class="api-popover-help" style="font-size:0.78em">每個 request 變 <code>/skill {name} {input}</code>，hit skill_registry + _apply_matched_skill + tool dispatch；無 LLM 無外網。</span>
+      </div>
+      <div class="stress-controls">
+        <button id="stress-go" class="settings-save-btn">▶ Run</button>
+        <button id="stress-abort" class="api-popover-link hidden">⏹ Abort</button>
+      </div>
+      <div id="stress-results" class="stress-results"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════ Agent Tools Modal (v8.44) ═══════ -->
+<div id="agent-tools-modal" class="tool-modal hidden">
+  <div class="tool-modal-content at-modal-content">
+    <div class="tool-modal-header">
+      <h3>🤖 Agent 工具 <span id="at-count" class="at-count-badge"></span></h3>
+      <div class="at-header-actions">
+        <button id="at-reload-btn" class="at-reload-btn" title="重新掃描 services/custom_tools/">↺ 熱載入</button>
+        <button id="at-ai-design-btn" class="at-ai-design-btn" title="用 AI 自動生成新工具">✦ AI 生成</button>
+        <button id="at-add-btn" class="at-add-btn" title="手動登記新工具 schema">＋ 手動加</button>
+        <button class="tool-modal-close" data-modal="agent-tools-modal">×</button>
+      </div>
+    </div>
+
+    <!-- Add tool form (hidden by default) -->
+    <div id="at-add-form" class="at-add-form hidden">
+      <div class="at-add-form-inner">
+        <div class="at-form-row">
+          <label class="at-form-label">名稱 (snake_case)</label>
+          <input type="text" id="at-new-name" class="at-input" placeholder="my_tool_name" />
+        </div>
+        <div class="at-form-row at-form-row-3col">
+          <div>
+            <label class="at-form-label">類別</label>
+            <select id="at-new-category" class="at-select">
+              <option value="misc">misc</option>
+              <option value="screen">screen</option>
+              <option value="mouse">mouse</option>
+              <option value="keyboard">keyboard</option>
+              <option value="file">file</option>
+              <option value="state">state</option>
+              <option value="clipboard">clipboard</option>
+              <option value="nav">nav</option>
+              <option value="wait">wait</option>
+            </select>
+          </div>
+          <div>
+            <label class="at-form-label">needs_visual</label>
+            <label class="at-toggle"><input type="checkbox" id="at-new-visual"> 視覺定位</label>
+          </div>
+        </div>
+        <div class="at-form-row">
+          <label class="at-form-label">描述</label>
+          <textarea id="at-new-desc" class="at-textarea" rows="3" placeholder="工具嘅用途描述（Planner + Executor 都會睇到）"></textarea>
+        </div>
+        <div class="at-form-row">
+          <label class="at-form-label">Args Schema (JSON，留空 = 無參數)</label>
+          <textarea id="at-new-args" class="at-textarea at-textarea-code" rows="3" placeholder='{"type":"object","properties":{"path":{"type":"str","description":"文件路徑"}},"required":["path"]}'></textarea>
+        </div>
+        <div class="at-form-row at-form-note">
+          ⚠ 自定義工具需要喺 <code>services/computer_tools.py</code> 添加對應 Python 實作先會真正執行。呢度登記嘅係 schema（Planner 參考用）。
+        </div>
+        <div class="at-form-actions">
+          <button id="at-new-save" class="at-btn-primary">新增工具</button>
+          <button id="at-new-cancel" class="at-btn-secondary">取消</button>
+          <span id="at-new-status" class="at-form-status"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Tool Designer panel (hidden by default) -->
+    <div id="at-ai-panel" class="at-ai-panel hidden">
+      <div class="at-ai-panel-inner">
+        <div class="at-ai-title">✦ AI 工具設計師</div>
+        <div class="at-form-row">
+          <label class="at-form-label">描述你想要嘅工具功能</label>
+          <div class="at-ai-input-row">
+            <textarea id="at-ai-intent" class="at-textarea" rows="2"
+              placeholder="例：截取某個視窗並儲存成 PNG  /  讀取 Excel 表格第一頁數據  /  壓縮指定資料夾成 zip"></textarea>
+            <button id="at-ai-go" class="at-btn-primary at-ai-go-btn">🤖 生成</button>
+          </div>
+        </div>
+        <div class="at-ai-status-row">
+          <span id="at-ai-status" class="at-form-status"></span>
+          <button id="at-ai-cancel" class="at-btn-secondary at-ai-close-btn">收起</button>
+        </div>
+
+        <!-- Preview of generated tool (shown after design) -->
+        <div id="at-ai-preview" class="at-ai-preview hidden"></div>
+
+        <!-- Install / discard actions -->
+        <div id="at-ai-preview-actions" class="at-form-actions hidden" style="margin-top:8px">
+          <button id="at-ai-install" class="at-btn-primary">⬇ 安裝工具</button>
+          <button id="at-ai-discard" class="at-btn-secondary">✕ 丟棄</button>
+          <span style="font-size:0.75em;color:var(--fg-dim,#888)">可以喺安裝前直接編輯上面嘅 Python 代碼</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category filter pills -->
+    <div id="at-filter-bar" class="at-filter-bar">
+      <button class="at-filter-pill active" data-cat="">全部</button>
+      <button class="at-filter-pill" data-cat="screen">screen</button>
+      <button class="at-filter-pill" data-cat="mouse">mouse</button>
+      <button class="at-filter-pill" data-cat="keyboard">keyboard</button>
+      <button class="at-filter-pill" data-cat="file">file</button>
+      <button class="at-filter-pill" data-cat="state">state</button>
+      <button class="at-filter-pill" data-cat="clipboard">clipboard</button>
+      <button class="at-filter-pill" data-cat="nav">nav</button>
+      <button class="at-filter-pill" data-cat="wait">wait</button>
+      <button class="at-filter-pill" data-cat="misc">misc</button>
+    </div>
+
+    <!-- Tool card grid -->
+    <div id="at-grid" class="at-grid">
+      <div class="at-loading">載入工具⋯</div>
+    </div>
+
+    <!-- Inline edit panel (appears above grid when editing) -->
+    <div id="at-edit-panel" class="at-edit-panel hidden">
+      <div class="at-edit-panel-inner">
+        <div class="at-edit-title">✏ 修改工具：<code id="at-edit-name-label"></code></div>
+        <div class="at-form-row">
+          <label class="at-form-label">描述</label>
+          <textarea id="at-edit-desc" class="at-textarea" rows="3"></textarea>
+        </div>
+        <div class="at-form-row at-form-row-2col">
+          <div>
+            <label class="at-form-label">類別</label>
+            <select id="at-edit-category" class="at-select">
+              <option value="misc">misc</option>
+              <option value="screen">screen</option>
+              <option value="mouse">mouse</option>
+              <option value="keyboard">keyboard</option>
+              <option value="file">file</option>
+              <option value="state">state</option>
+              <option value="clipboard">clipboard</option>
+              <option value="nav">nav</option>
+              <option value="wait">wait</option>
+            </select>
+          </div>
+          <div>
+            <label class="at-form-label">needs_visual</label>
+            <label class="at-toggle"><input type="checkbox" id="at-edit-visual"> 視覺定位</label>
+          </div>
+        </div>
+        <div class="at-form-actions">
+          <button id="at-edit-save" class="at-btn-primary">儲存</button>
+          <button id="at-edit-cancel" class="at-btn-secondary">取消</button>
+          <span id="at-edit-status" class="at-form-status"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── Agent Tools Modal styles (v8.44) ── */
+.at-modal-content { max-width: 860px; width: 96vw; max-height: 88vh; display: flex; flex-direction: column; }
+.at-modal-content .tool-modal-body { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 0; padding: 0; }
+.at-header-actions { display: flex; align-items: center; gap: 8px; }
+.at-add-btn { background: var(--accent, #5a7fdb); color: #fff; border: none; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 0.88em; }
+.at-add-btn:hover { opacity: 0.85; }
+.at-count-badge { font-size: 0.75em; background: rgba(255,255,255,.15); border-radius: 10px; padding: 2px 7px; vertical-align: middle; }
+
+/* Filter pills */
+.at-filter-bar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 16px 8px; border-bottom: 1px solid var(--border, rgba(255,255,255,.1)); }
+.at-filter-pill { border: 1px solid var(--border, rgba(255,255,255,.2)); background: transparent; color: var(--fg, #ccc); border-radius: 14px; padding: 3px 11px; font-size: 0.8em; cursor: pointer; transition: background .15s; }
+.at-filter-pill:hover { background: rgba(255,255,255,.08); }
+.at-filter-pill.active { background: var(--accent, #5a7fdb); border-color: var(--accent, #5a7fdb); color: #fff; }
+
+/* Card grid */
+.at-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; padding: 14px 16px; }
+.at-loading { grid-column: 1/-1; text-align: center; opacity: .5; padding: 32px; }
+
+.at-card { background: var(--card-bg, rgba(255,255,255,.06)); border: 1px solid var(--border, rgba(255,255,255,.1)); border-radius: 10px; padding: 12px 13px; display: flex; flex-direction: column; gap: 6px; transition: border-color .15s; }
+.at-card:hover { border-color: var(--accent, #5a7fdb); }
+.at-card-header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.at-cat-badge { font-size: 0.7em; border-radius: 4px; padding: 2px 6px; font-weight: 600; letter-spacing: .03em; text-transform: uppercase; }
+.at-cat-screen   { background: #1e4280; color: #7eb6ff; }
+.at-cat-mouse    { background: #3d2400; color: #ffb347; }
+.at-cat-keyboard { background: #2d1a4d; color: #c89eff; }
+.at-cat-file     { background: #0f3320; color: #5be87a; }
+.at-cat-state    { background: #0f3333; color: #5be8d8; }
+.at-cat-clipboard{ background: #3d3400; color: #ffe05b; }
+.at-cat-nav      { background: #1a2b4d; color: #7ecfff; }
+.at-cat-wait     { background: #2a2a2a; color: #aaa; }
+.at-cat-misc     { background: #2a2a2a; color: #aaa; }
+.at-cat-custom   { background: #3d1020; color: #ff7eb6; }
+.at-visual-badge { font-size: 0.68em; background: rgba(255,180,0,.15); color: #ffb800; border: 1px solid rgba(255,180,0,.3); border-radius: 4px; padding: 1px 5px; }
+.at-custom-badge { font-size: 0.68em; background: rgba(255,100,160,.15); color: #ff64a0; border: 1px solid rgba(255,100,160,.3); border-radius: 4px; padding: 1px 5px; }
+
+.at-card-name { font-size: 0.88em; font-weight: 600; font-family: monospace; color: var(--fg, #ddd); word-break: break-all; }
+.at-card-desc { font-size: 0.78em; color: var(--fg-dim, #999); line-height: 1.45; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.at-card-footer { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.at-card-args { font-size: 0.72em; color: var(--fg-dim, #888); flex: 1; }
+.at-card-edit-btn { font-size: 0.75em; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: var(--fg, #ccc); border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+.at-card-edit-btn:hover { background: rgba(90,127,219,.3); }
+.at-card-del-btn  { font-size: 0.75em; background: rgba(255,80,80,.08); border: 1px solid rgba(255,80,80,.2); color: #ff8080; border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+.at-card-del-btn:hover { background: rgba(255,80,80,.2); }
+
+/* Edit panel */
+.at-edit-panel { padding: 0 16px 4px; }
+.at-edit-panel-inner { background: var(--card-bg, rgba(255,255,255,.06)); border: 1px solid var(--accent, #5a7fdb); border-radius: 10px; padding: 14px; }
+.at-edit-title { font-size: 0.88em; font-weight: 600; margin-bottom: 12px; }
+
+/* Add form */
+.at-add-form { padding: 0 16px 4px; }
+.at-add-form-inner { background: var(--card-bg, rgba(255,255,255,.06)); border: 1px solid rgba(90,200,90,.4); border-radius: 10px; padding: 14px; }
+
+/* Shared form elements */
+.at-form-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.at-form-row-2col { flex-direction: row; gap: 16px; }
+.at-form-row-2col > div { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.at-form-row-3col { flex-direction: row; gap: 16px; }
+.at-form-row-3col > div { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.at-form-label { font-size: 0.78em; color: var(--fg-dim, #aaa); }
+.at-input { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: 6px; color: var(--fg, #ddd); padding: 5px 9px; font-size: 0.85em; }
+.at-input:focus { outline: none; border-color: var(--accent, #5a7fdb); }
+.at-select { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: 6px; color: var(--fg, #ddd); padding: 5px 9px; font-size: 0.85em; }
+.at-textarea { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: 6px; color: var(--fg, #ddd); padding: 6px 9px; font-size: 0.82em; resize: vertical; line-height: 1.5; }
+.at-textarea-code { font-family: monospace; font-size: 0.78em; }
+.at-textarea:focus, .at-select:focus { outline: none; border-color: var(--accent, #5a7fdb); }
+.at-toggle { font-size: 0.85em; display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 5px 0; }
+.at-form-actions { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.at-btn-primary { background: var(--accent, #5a7fdb); color: #fff; border: none; border-radius: 6px; padding: 5px 14px; cursor: pointer; font-size: 0.85em; }
+.at-btn-primary:hover { opacity: .85; }
+.at-btn-secondary { background: transparent; color: var(--fg-dim, #aaa); border: 1px solid rgba(255,255,255,.2); border-radius: 6px; padding: 5px 14px; cursor: pointer; font-size: 0.85em; }
+.at-btn-secondary:hover { background: rgba(255,255,255,.06); }
+.at-form-status { font-size: 0.8em; }
+.at-form-status.ok { color: #5be87a; }
+.at-form-status.err { color: #ff8080; }
+.at-form-note { font-size: 0.75em; color: var(--fg-dim, #888); background: rgba(255,180,0,.06); border: 1px solid rgba(255,180,0,.15); border-radius: 6px; padding: 7px 10px; line-height: 1.5; }
+.at-form-note code { background: rgba(255,255,255,.08); border-radius: 3px; padding: 0 4px; }
+
+/* AI Designer */
+.at-ai-design-btn { background: linear-gradient(135deg,#4a2d8a,#6a3db0); color:#e0d0ff; border:none; border-radius:6px; padding:4px 12px; cursor:pointer; font-size:0.88em; }
+.at-ai-design-btn:hover { opacity:.85; }
+.at-reload-btn { background: transparent; color: var(--fg-dim,#aaa); border:1px solid rgba(255,255,255,.2); border-radius:6px; padding:4px 10px; cursor:pointer; font-size:0.85em; }
+.at-reload-btn:hover { background: rgba(255,255,255,.06); }
+.at-ai-panel { padding: 0 16px 4px; }
+.at-ai-panel-inner { background: rgba(80,50,160,.12); border: 1px solid rgba(140,100,220,.4); border-radius:10px; padding:14px; }
+.at-ai-title { font-size:0.9em; font-weight:600; color:#c0a0ff; margin-bottom:12px; }
+.at-ai-input-row { display:flex; gap:8px; align-items:flex-start; }
+.at-ai-input-row .at-textarea { flex:1; }
+.at-ai-go-btn { flex-shrink:0; align-self:flex-end; padding:7px 14px; background: linear-gradient(135deg,#4a2d8a,#6a3db0); }
+.at-ai-status-row { display:flex; align-items:center; justify-content:space-between; margin-top:4px; }
+.at-ai-close-btn { padding:3px 10px; font-size:0.8em; }
+
+/* Draft preview */
+.at-ai-preview { margin-top:12px; }
+.at-ai-preview-inner { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:12px; }
+.at-ai-meta-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.at-ai-name { font-family:monospace; font-size:0.9em; font-weight:700; color:var(--fg,#ddd); }
+.at-ai-desc { font-size:0.82em; color:var(--fg-dim,#bbb); margin-bottom:10px; line-height:1.5; }
+.at-ai-args-table { width:100%; border-collapse:collapse; font-size:0.78em; margin-bottom:10px; }
+.at-ai-args-table th { text-align:left; padding:4px 8px; border-bottom:1px solid rgba(255,255,255,.1); color:var(--fg-dim,#aaa); }
+.at-ai-args-table td { padding:4px 8px; border-bottom:1px solid rgba(255,255,255,.05); color:var(--fg,#ccc); }
+.at-ai-td-mono { font-family:monospace; }
+.at-ai-no-args { font-size:0.8em; color:var(--fg-dim,#888); margin-bottom:8px; }
+.at-ai-code-label { font-size:0.75em; color:var(--fg-dim,#aaa); margin-bottom:4px; margin-top:6px; }
+.at-ai-code-editor { width:100%; box-sizing:border-box; font-size:0.76em; line-height:1.55; min-height:180px; }
+.at-ai-explanation { font-size:0.75em; color:var(--fg-dim,#888); margin-top:8px; font-style:italic; }
+.at-ai-warn { background:rgba(255,180,0,.1); border:1px solid rgba(255,180,0,.3); border-radius:6px; padding:6px 10px; font-size:0.78em; color:#ffcc44; margin-bottom:8px; }
+
+/* ── Tool Workshop inline install card ── */
+.tw-install-card { margin-top:14px; border:1px solid rgba(100,200,120,.4); border-radius:10px; background:rgba(80,160,100,.08); overflow:hidden; }
+.tw-card-header { display:flex; align-items:center; gap:8px; padding:10px 14px 6px; border-bottom:1px solid rgba(100,200,120,.2); }
+.tw-card-icon { font-size:1.1em; }
+.tw-card-title { font-size:0.85em; font-weight:600; color:#90e0a0; }
+.tw-card-body { padding:12px 14px; }
+.tw-meta-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.tw-tool-name { font-family:monospace; font-size:0.9em; font-weight:700; color:var(--fg,#ddd); }
+.tw-desc { font-size:0.82em; color:var(--fg-dim,#bbb); margin-bottom:8px; line-height:1.5; }
+.tw-code-details { margin-top:6px; }
+.tw-code-summary { font-size:0.78em; color:var(--fg-dim,#aaa); cursor:pointer; padding:4px 0; }
+.tw-code-edit-hint { font-size:0.85em; opacity:.6; }
+.tw-code-editor { width:100%; box-sizing:border-box; margin-top:6px; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.1); border-radius:6px; color:var(--fg,#ddd); font-family:monospace; font-size:0.76em; line-height:1.55; padding:8px; resize:vertical; min-height:140px; }
+.tw-card-actions { display:flex; align-items:center; gap:8px; padding:10px 14px; border-top:1px solid rgba(100,200,120,.15); }
+.tw-install-btn { background:rgba(90,200,110,.2); border:1px solid rgba(90,200,110,.5); color:#90e0a0; border-radius:6px; padding:5px 14px; cursor:pointer; font-size:0.85em; font-weight:600; }
+.tw-install-btn:hover { background:rgba(90,200,110,.35); }
+.tw-install-btn:disabled { opacity:.5; cursor:default; }
+.tw-dismiss-btn { background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--fg-dim,#aaa); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:0.85em; }
+.tw-install-status { font-size:0.8em; margin-left:4px; }
+</style>
+
+<!-- ═══════ App Control Modal (v8.47b) ═══════ -->
+<div id="app-control-modal" class="tool-modal hidden">
+  <div class="tool-modal-content ac-modal-content">
+    <div class="tool-modal-header">
+      <h3>🖥 App 控制</h3>
+      <div class="ac-header-actions">
+        <button id="ac-refresh-btn" class="ac-refresh-btn" title="重新掃描">↺ 更新</button>
+        <button class="tool-modal-close" data-modal="app-control-modal">×</button>
+      </div>
+    </div>
+
+    <!-- Dep status bar -->
+    <div id="ac-dep-bar" class="ac-dep-bar">
+      <span id="ac-dep-status" class="ac-dep-status">檢查中⋯</span>
+      <button id="ac-install-deps-btn" class="ac-install-btn hidden">⬇ 安裝自動化依賴</button>
+    </div>
+
+    <!-- App cards -->
+    <div id="ac-apps-grid" class="ac-apps-grid">
+      <div class="ac-loading">載入中⋯</div>
+    </div>
+
+    <!-- Send panel -->
+    <div id="ac-send-panel" class="ac-send-panel hidden">
+      <div class="ac-send-header">
+        <span id="ac-send-target" class="ac-send-target"></span>
+        <button id="ac-send-close" class="ac-send-close">✕</button>
+      </div>
+      <div class="ac-send-row">
+        <textarea id="ac-send-input" class="ac-send-textarea" rows="3"
+                  placeholder="輸入要發送到 App 的訊息⋯ (Ctrl+Enter 送出)"></textarea>
+        <button id="ac-send-btn" class="ac-send-submit-btn">▶ 發送</button>
+      </div>
+      <div id="ac-send-status" class="ac-send-status"></div>
+      <div class="ac-send-note">
+        系統會自動聚焦目標 App 視窗並模擬輸入。發送後 App 會彈到前台。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════ Local LLM Direct Chat Drawer (v8.46) ═══════ -->
+<div id="local-chat-drawer" class="lc-drawer hidden">
+  <div class="lc-drawer-inner">
+    <div class="lc-drawer-header">
+      <span id="lc-app-label" class="lc-app-label">本機模型直接對話</span>
+      <div class="lc-header-actions">
+        <button id="lc-clear-btn" class="lc-clear-btn" title="清空對話">🗑</button>
+        <button id="lc-close-btn" class="lc-close-btn" title="關閉">×</button>
+      </div>
+    </div>
+
+    <!-- Config row -->
+    <div class="lc-config-row">
+      <div class="lc-config-group">
+        <label class="lc-label">API Base</label>
+        <input id="lc-api-base" class="lc-input" type="text" placeholder="http://localhost:11434" />
+      </div>
+      <div class="lc-config-group">
+        <label class="lc-label">Provider</label>
+        <select id="lc-provider" class="lc-select">
+          <option value="openai">OpenAI-compat</option>
+          <option value="ollama">Ollama</option>
+        </select>
+      </div>
+      <div class="lc-config-group lc-config-model">
+        <label class="lc-label">Model</label>
+        <input id="lc-model-input" class="lc-input" type="text" placeholder="llama3:8b" />
+      </div>
+    </div>
+    <div class="lc-system-row">
+      <label class="lc-label">System prompt</label>
+      <input id="lc-system" class="lc-input" type="text" value="你係 URUK 協議載體嘅直接回應模式，用廣東話回答。" />
+    </div>
+
+    <!-- Chat history -->
+    <div id="lc-history" class="lc-history"></div>
+
+    <!-- Input -->
+    <div class="lc-input-row">
+      <textarea id="lc-input" class="lc-textarea" rows="2" placeholder="輸入訊息⋯ (Enter 送出)"></textarea>
+      <button id="lc-send-btn" class="lc-send-btn">▶</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── Local LLM Discovery (Settings section) ── */
+.llm-scan-controls { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.llm-scan-btn { background:var(--accent,#5a7fdb); color:#fff; border:none; border-radius:6px; padding:6px 16px; cursor:pointer; font-size:0.85em; }
+.llm-scan-btn:hover { opacity:.85; }
+.llm-scan-btn:disabled { opacity:.5; cursor:default; }
+.llm-status { font-size:0.82em; }
+.llm-status.ok { color:#5be87a; }
+.llm-status.err { color:#f88; }
+.llm-apps-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
+.llm-empty { grid-column:1/-1; font-size:0.82em; color:var(--fg-dim,#888); padding:12px; text-align:center; }
+.llm-empty.err { color:#f88; }
+
+.llm-app-card { background:var(--card-bg,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.1)); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:7px; }
+.llm-app-header { display:flex; align-items:center; gap:7px; }
+.llm-app-icon { font-size:1.15em; }
+.llm-app-name { font-weight:600; font-size:0.9em; flex:1; }
+.llm-app-port { font-size:0.75em; color:var(--fg-dim,#aaa); font-family:monospace; }
+.llm-online-dot { color:#5be87a; font-size:0.8em; }
+.llm-app-base { font-size:0.72em; color:var(--fg-dim,#888); font-family:monospace; word-break:break-all; }
+.llm-model-row { display:flex; align-items:center; gap:8px; }
+.llm-model-select { flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15); border-radius:5px; color:var(--fg,#ddd); padding:4px 7px; font-size:0.8em; }
+.llm-model-count { font-size:0.72em; color:var(--fg-dim,#888); white-space:nowrap; }
+.llm-no-models { font-size:0.75em; color:var(--fg-dim,#888); }
+.llm-card-actions { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.llm-chat-btn { background:rgba(90,127,219,.2); border:1px solid rgba(90,127,219,.4); color:#7eb6ff; border-radius:6px; padding:3px 10px; cursor:pointer; font-size:0.78em; }
+.llm-chat-btn:hover { background:rgba(90,127,219,.35); }
+.llm-add-btn  { background:rgba(90,200,110,.12); border:1px solid rgba(90,200,110,.35); color:#5be87a; border-radius:6px; padding:3px 10px; cursor:pointer; font-size:0.78em; }
+.llm-add-btn:hover { background:rgba(90,200,110,.25); }
+.llm-card-status { font-size:0.75em; flex:1; }
+
+/* ── Direct Chat Drawer ── */
+.lc-drawer { position:fixed; right:0; top:0; height:100vh; width:420px; max-width:95vw; background:var(--bg,#1a1a2e); border-left:1px solid var(--border,rgba(255,255,255,.1)); display:flex; flex-direction:column; z-index:1100; box-shadow:-4px 0 24px rgba(0,0,0,.5); }
+.lc-drawer-inner { display:flex; flex-direction:column; height:100%; }
+.lc-drawer-header { display:flex; align-items:center; gap:8px; padding:12px 14px 10px; border-bottom:1px solid var(--border,rgba(255,255,255,.1)); flex-shrink:0; }
+.lc-app-label { font-size:0.88em; font-weight:600; flex:1; color:var(--fg,#ddd); }
+.lc-header-actions { display:flex; gap:6px; }
+.lc-clear-btn, .lc-close-btn { background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--fg-dim,#aaa); border-radius:5px; padding:3px 8px; cursor:pointer; font-size:0.85em; }
+.lc-clear-btn:hover, .lc-close-btn:hover { background:rgba(255,255,255,.06); }
+
+.lc-config-row { display:flex; gap:8px; padding:10px 14px 4px; flex-shrink:0; flex-wrap:wrap; }
+.lc-config-group { display:flex; flex-direction:column; gap:3px; flex:1; min-width:90px; }
+.lc-config-model { flex:2; }
+.lc-system-row { display:flex; flex-direction:column; gap:3px; padding:4px 14px 8px; flex-shrink:0; }
+.lc-label { font-size:0.72em; color:var(--fg-dim,#aaa); }
+.lc-input, .lc-select { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:5px; color:var(--fg,#ddd); padding:5px 8px; font-size:0.82em; }
+.lc-input:focus { outline:none; border-color:var(--accent,#5a7fdb); }
+.lc-select { cursor:pointer; }
+
+.lc-history { flex:1; overflow-y:auto; padding:10px 14px; display:flex; flex-direction:column; gap:10px; }
+.lc-msg { padding:9px 12px; border-radius:10px; font-size:0.85em; line-height:1.55; max-width:90%; white-space:pre-wrap; word-break:break-word; }
+.lc-msg-user { background:rgba(90,127,219,.2); border:1px solid rgba(90,127,219,.3); color:var(--fg,#ddd); align-self:flex-end; }
+.lc-msg-assistant { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:var(--fg,#ddd); align-self:flex-start; }
+.lc-msg-system { background:rgba(255,180,0,.08); border:1px solid rgba(255,180,0,.2); color:#ffcc44; font-size:0.78em; align-self:center; }
+
+.lc-input-row { display:flex; gap:8px; padding:10px 14px 12px; border-top:1px solid var(--border,rgba(255,255,255,.08)); flex-shrink:0; }
+.lc-textarea { flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; color:var(--fg,#ddd); padding:8px 10px; font-size:0.85em; resize:none; line-height:1.5; }
+.lc-textarea:focus { outline:none; border-color:var(--accent,#5a7fdb); }
+.lc-send-btn { background:var(--accent,#5a7fdb); color:#fff; border:none; border-radius:8px; padding:0 18px; cursor:pointer; font-size:1.1em; flex-shrink:0; }
+.lc-send-btn:hover { opacity:.85; }
+.lc-send-btn:disabled { opacity:.5; cursor:default; }
+
+/* ── Claude Connect (v8.47) ────────────────────────────────── */
+.claude-status-bar { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.claude-dot { font-size:1.1em; }
+.claude-dot.online  { color:#5be87a; }
+.claude-dot.offline { color:#888; }
+.claude-status-text { font-size:0.85em; color:var(--fg-dim,#aaa); flex:1; }
+.claude-chat-open-btn { background:var(--accent,#5a7fdb); color:#fff; border:none; border-radius:6px; padding:4px 12px; cursor:pointer; font-size:0.82em; }
+.claude-chat-open-btn:hover { opacity:.85; }
+.claude-disconnect-btn { background:rgba(255,100,100,.15); border:1px solid rgba(255,100,100,.3); color:#f88; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:0.78em; }
+.claude-disconnect-btn:hover { background:rgba(255,100,100,.25); }
+.claude-connect-form { display:flex; flex-direction:column; gap:8px; max-width:480px; }
+.claude-key-row { display:flex; gap:6px; }
+.claude-key-input { flex:1; background:rgba(255,255,255,.06); border:1px solid var(--border,rgba(255,255,255,.12)); border-radius:7px; color:var(--fg,#ddd); padding:7px 10px; font-size:0.84em; font-family:monospace; }
+.claude-key-input:focus { outline:none; border-color:var(--accent,#5a7fdb); }
+.claude-key-toggle { background:rgba(255,255,255,.08); border:1px solid var(--border,rgba(255,255,255,.12)); border-radius:7px; padding:0 10px; cursor:pointer; font-size:0.9em; color:var(--fg-dim,#aaa); }
+.claude-key-toggle:hover { background:rgba(255,255,255,.14); }
+.claude-model-row { display:flex; align-items:center; gap:8px; }
+.claude-model-label { font-size:0.83em; color:var(--fg-dim,#aaa); white-space:nowrap; }
+.claude-model-select { background:rgba(255,255,255,.06); border:1px solid var(--border,rgba(255,255,255,.12)); border-radius:7px; color:var(--fg,#ddd); padding:5px 8px; font-size:0.83em; cursor:pointer; }
+.claude-connect-btn { background:rgba(91,232,122,.18); border:1px solid rgba(91,232,122,.35); color:#5be87a; border-radius:7px; padding:7px 16px; cursor:pointer; font-size:0.85em; font-weight:600; align-self:flex-start; }
+.claude-connect-btn:hover { background:rgba(91,232,122,.28); }
+.claude-connect-btn:disabled { opacity:.5; cursor:default; }
+.claude-connect-status { font-size:0.82em; color:var(--fg-dim,#aaa); align-self:center; }
+.claude-connect-status.ok  { color:#5be87a; }
+.claude-connect-status.err { color:#f88; }
+
+/* ── Pre-Gate suggest chip ────────────────────────────────── */
+.pre-gate-suggest { background:rgba(255,220,80,.1); border:1px solid rgba(255,220,80,.3); border-radius:6px; padding:6px 12px; font-size:0.82em; color:#ffd850; margin:6px 0; }
+
+/* ── Agent Chat mode row + panel ──────────────────────────── */
+.agent-chat-mode-row { align-items: center; }
+.agent-chat-panel { background: rgba(255,140,60,.06); border: 1px solid rgba(255,140,60,.2); border-radius: 10px; margin: 10px 0; overflow: hidden; }
+.agent-chat-header { display:flex; align-items:center; gap:8px; padding:10px 14px; background:rgba(255,140,60,.08); border-bottom:1px solid rgba(255,140,60,.15); }
+.agent-chat-icon { font-size:1.1em; }
+.agent-chat-title { font-weight:600; color:var(--fg,#ddd); }
+.agent-chat-status { font-size:0.8em; color:#ffa040; margin-left:auto; }
+.agent-chat-clear { background:none; border:1px solid rgba(255,255,255,.15); border-radius:4px; color:var(--fg-dim,#aaa); cursor:pointer; padding:2px 8px; font-size:0.78em; }
+.agent-chat-steps { padding:10px 14px; display:flex; flex-direction:column; gap:6px; max-height:380px; overflow-y:auto; }
+.agent-step { display:flex; align-items:flex-start; gap:10px; padding:7px 10px; border-radius:6px; font-size:0.85em; background:rgba(255,255,255,.04); }
+.agent-step.running { background:rgba(255,200,60,.07); border-left:3px solid #ffc840; }
+.agent-step.ok { background:rgba(80,220,120,.06); border-left:3px solid #50dc78; }
+.agent-step.fail { background:rgba(255,80,80,.07); border-left:3px solid #f55; }
+.agent-step.plan { background:rgba(100,160,255,.07); border-left:3px solid #64a0ff; }
+.agent-step-icon { font-size:1em; min-width:18px; text-align:center; }
+.agent-step-body { flex:1; }
+.agent-step-tool { font-weight:600; color:var(--fg,#ddd); }
+.agent-step-purpose { color:var(--fg-dim,#aaa); font-size:0.92em; margin-top:2px; }
+.agent-step-result { color:#8be; font-size:0.88em; margin-top:3px; font-family:monospace; word-break:break-all; }
+
+/* ── Smart Auto mode row ───────────────────────────────────── */
+.sa-mode-row { flex-wrap: wrap; gap: 6px; align-items: center; }
+.sa-badge { font-size:0.75em; padding:2px 8px; border-radius:10px; background:rgba(120,180,255,.12); border:1px solid rgba(120,180,255,.25); color:#8bc4ff; white-space:nowrap; transition:background .3s; }
+.sa-badge.desktop { background:rgba(90,230,140,.12); border-color:rgba(90,230,140,.3); color:#5be87a; }
+.sa-badge.ollama  { background:rgba(255,200,80,.10); border-color:rgba(255,200,80,.3);  color:#ffc850; }
+.sa-badge.api     { background:rgba(200,120,255,.10); border-color:rgba(200,120,255,.3); color:#c878ff; }
+
+/* ── App Relay mode row ────────────────────────────────────── */
+.ar-mode-row { flex-wrap: wrap; gap: 6px; }
+.ar-target-select { background:rgba(255,255,255,.07); border:1px solid var(--border,rgba(255,255,255,.12)); border-radius:6px; color:var(--fg,#ddd); padding:3px 8px; font-size:0.8em; cursor:pointer; margin-left:4px; }
+
+/* ── App Control Modal (v8.47b) ────────────────────────────── */
+.ac-modal-content { max-width:560px; width:94vw; display:flex; flex-direction:column; gap:14px; }
+.ac-header-actions { display:flex; gap:8px; align-items:center; }
+.ac-refresh-btn { background:rgba(255,255,255,.07); border:1px solid var(--border,rgba(255,255,255,.12)); border-radius:7px; color:var(--fg-dim,#aaa); padding:4px 12px; cursor:pointer; font-size:0.82em; }
+.ac-refresh-btn:hover { background:rgba(255,255,255,.13); }
+
+.ac-dep-bar { background:rgba(255,255,255,.04); border-radius:8px; padding:8px 12px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.ac-dep-status { font-size:0.82em; color:var(--fg-dim,#aaa); flex:1; }
+.ac-dep-status.ok  { color:#5be87a; }
+.ac-dep-status.warn { color:#f8c94a; }
+.ac-install-btn { background:rgba(248,201,74,.15); border:1px solid rgba(248,201,74,.3); color:#f8c94a; border-radius:6px; padding:5px 12px; cursor:pointer; font-size:0.8em; }
+.ac-install-btn:hover { background:rgba(248,201,74,.25); }
+
+.ac-apps-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; }
+.ac-loading { color:var(--fg-dim,#aaa); font-size:0.85em; padding:12px; text-align:center; }
+
+.ac-app-card { background:var(--card-bg,rgba(255,255,255,.06)); border:1px solid var(--border,rgba(255,255,255,.1)); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+.ac-app-header { display:flex; align-items:center; gap:8px; }
+.ac-app-icon { font-size:1.4em; }
+.ac-app-name { font-size:0.95em; font-weight:600; color:var(--fg,#ddd); flex:1; }
+.ac-app-dot { font-size:1em; }
+.ac-app-dot.online  { color:#5be87a; }
+.ac-app-dot.offline { color:#888; }
+.ac-app-status-text { font-size:0.78em; color:var(--fg-dim,#888); }
+.ac-app-actions { display:flex; gap:7px; flex-wrap:wrap; }
+.ac-launch-btn { background:rgba(255,255,255,.07); border:1px solid var(--border,rgba(255,255,255,.15)); border-radius:6px; color:var(--fg-dim,#bbb); padding:5px 11px; cursor:pointer; font-size:0.8em; }
+.ac-launch-btn:hover { background:rgba(255,255,255,.14); }
+.ac-launch-btn:disabled { opacity:.45; cursor:default; }
+.ac-send-open-btn { background:rgba(91,232,122,.16); border:1px solid rgba(91,232,122,.32); border-radius:6px; color:#5be87a; padding:5px 11px; cursor:pointer; font-size:0.8em; font-weight:600; }
+.ac-send-open-btn:hover { background:rgba(91,232,122,.26); }
+.ac-send-open-btn:disabled { opacity:.45; cursor:default; }
+
+.ac-send-panel { background:rgba(255,255,255,.04); border:1px solid var(--border,rgba(255,255,255,.12)); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+.ac-send-header { display:flex; align-items:center; justify-content:space-between; }
+.ac-send-target { font-size:0.9em; font-weight:600; color:var(--fg,#ddd); }
+.ac-send-close { background:none; border:none; color:var(--fg-dim,#aaa); cursor:pointer; font-size:1.1em; padding:0 4px; }
+.ac-send-close:hover { color:var(--fg,#ddd); }
+.ac-send-row { display:flex; gap:8px; align-items:flex-end; }
+.ac-send-textarea { flex:1; background:rgba(255,255,255,.06); border:1px solid var(--border,rgba(255,255,255,.12)); border-radius:8px; color:var(--fg,#ddd); padding:8px 10px; font-size:0.85em; resize:vertical; line-height:1.5; min-height:60px; }
+.ac-send-textarea:focus { outline:none; border-color:var(--accent,#5a7fdb); }
+.ac-send-submit-btn { background:var(--accent,#5a7fdb); color:#fff; border:none; border-radius:8px; padding:8px 16px; cursor:pointer; font-size:0.9em; flex-shrink:0; }
+.ac-send-submit-btn:hover { opacity:.85; }
+.ac-send-submit-btn:disabled { opacity:.5; cursor:default; }
+.ac-send-status { font-size:0.82em; min-height:1.2em; }
+.ac-send-status.ok  { color:#5be87a; }
+.ac-send-status.err { color:#f88; }
+.ac-send-note { font-size:0.77em; color:var(--fg-dim,#777); line-height:1.4; }
+</style>
+
+<!-- app.js (textarea editor + tool palette + settings modal) -->
+<script src="/static/vendor/leaflet/leaflet.js?v=1.9.4"></script>
+<script src="/static/world_atlas.js?v=20260622-2"></script>
+<script src="/static/app.js?v=20260622-atlas-1"></script>
+<script src="/static/agent_tools.js?v=20260528-1"></script>
+<script src="/static/local_llm.js?v=20260528-1"></script>
+<script src="/static/app_control.js?v=20260528-2"></script>
+</body>
+</html>

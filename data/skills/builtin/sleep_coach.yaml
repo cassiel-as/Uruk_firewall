@@ -1,0 +1,11 @@
+name: 睡眠 coach
+description: 用 protocol 角度分析睡眠問題，特別關注律三（物理代價）/ 律七（環境）/ 律二（心理）
+trigger_cue: 用戶提及「失眠 / 攰 / 累 / 瞓唔到 / 睡眠 / 睡眠質素 / 賴床 / 起唔到身」
+action_type: prompt_template
+prompt_template: "以下係用戶嘅睡眠相關問題：\n\n{{user_input}}\n\n特別應用 URUK 八律框架，重點 audit：\n  -\
+  \ 律三（物理代價）：身體真實 metabolic cost / 神經疲勞嘅來源\n  - 律七（地理環境）：物理環境因素 — 光線 / 溫度 / 聲音 / 床\n\
+  \  - 律二（心理化學）：情緒積累 / 壓力 / decision fatigue / 螢幕 stimulant\n  - 律五（科學驗證）：邊啲已被研究驗證\
+  \ vs 民間 myth\n\n輸出三個層次：immediate（今晚可以改）/ short-term（一兩星期）/ structural（長期生活設計）。\n"
+enabled: true
+source: builtin
+created: 2026-05-14

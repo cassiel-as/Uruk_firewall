@@ -1,0 +1,315 @@
+{
+  "schema_version": "uruk_controller_seed_cases.v1",
+  "purpose": "Human-reviewed routing boundary cases for the URUK Controller Model.",
+  "cases": [
+    {
+      "id": "small-capital-en",
+      "input": "What is the capital of France?",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "small-arithmetic-en",
+      "input": "What is 17 plus 25?",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "small-translation-en",
+      "input": "Translate hello into Japanese.",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "small-format-en",
+      "input": "Rewrite this title in lowercase: SYSTEM STATUS",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "small-unit-en",
+      "input": "Convert 5 kilometres to metres.",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "small-list-en",
+      "input": "List three primary colours.",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "small-cantonese",
+      "input": "請用廣東話一句回答：法國首都係邊度？",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "small-chinese",
+      "input": "將呢句轉成繁體中文：system ready",
+      "expected_route_kind": "small_task",
+      "expected_task_profile": "local_language"
+    },
+    {
+      "id": "protocol-freedom-en",
+      "input": "What is freedom?",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-identity-en",
+      "input": "Define identity.",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-truth-en",
+      "input": "What is truth?",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-dignity-en",
+      "input": "Explain human dignity.",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-entropy-en",
+      "input": "How does entropy relate to freedom?",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-coordinate-en",
+      "input": "Explain Coordinate Theory.",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-freedom-zh",
+      "input": "自由係咩？",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-self-zh",
+      "input": "點樣理解自我同身份？",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "deep-architecture-en",
+      "input": "Compare two architecture strategies for a reliable agent system.",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-lonely-cantonese",
+      "input": "點解我咁孤獨",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-numb-cantonese",
+      "input": "我好麻木乜都唔想做",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-collapse-cantonese",
+      "input": "我覺得就快崩潰",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-outsider-cantonese",
+      "input": "我覺得自己係異類",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-freedom-cantonese",
+      "input": "自由到底係咩",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-cost-cantonese",
+      "input": "代價係咩意思",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-formatting-cantonese",
+      "input": "格式化係咩嚟",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-society-cantonese",
+      "input": "點解會有社會",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-meaning-cantonese",
+      "input": "人生意義係咩",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-french-revolution-cantonese",
+      "input": "法國大革命發生咩事",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "protocol-time-pressure-cantonese",
+      "input": "成日覺得時間唔夠用",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "deep-causal-en",
+      "input": "Analyse the causal risks of giving an agent unrestricted authority.",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "deep-design-zh",
+      "input": "比較兩種系統 architecture 設計嘅長期風險。",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "deep-long-en",
+      "input": "We need a detailed evaluation of a multi-stage routing system, including failure recovery, authority boundaries, observability, regression testing, token budgets, model selection, and the operational tradeoffs between deterministic rules and learned controllers. Compare the options and recommend a deployment strategy.",
+      "expected_route_kind": "deep_reasoning",
+      "expected_task_profile": "deep_reasoning"
+    },
+    {
+      "id": "code-python-en",
+      "input": "Fix this Python bug and add a pytest regression test.",
+      "expected_route_kind": "code_task",
+      "expected_task_profile": "code_coworker"
+    },
+    {
+      "id": "code-refactor-en",
+      "input": "Refactor the TypeScript API client to handle timeout errors.",
+      "expected_route_kind": "code_task",
+      "expected_task_profile": "code_coworker"
+    },
+    {
+      "id": "code-powershell-en",
+      "input": "Debug this PowerShell script.",
+      "expected_route_kind": "code_task",
+      "expected_task_profile": "code_coworker"
+    },
+    {
+      "id": "code-cantonese",
+      "input": "幫我修正呢個 Python bug。",
+      "expected_route_kind": "code_task",
+      "expected_task_profile": "code_coworker"
+    },
+    {
+      "id": "tool-browser-en",
+      "input": "Open browser and take a screenshot.",
+      "expected_route_kind": "tool_task",
+      "expected_task_profile": "auto"
+    },
+    {
+      "id": "tool-file-en",
+      "input": "Open the local file and show its contents.",
+      "expected_route_kind": "tool_task",
+      "expected_task_profile": "auto"
+    },
+    {
+      "id": "tool-windows-en",
+      "input": "Use Windows Copilot to inspect the taskbar.",
+      "expected_route_kind": "tool_task",
+      "expected_task_profile": "windows_copilot"
+    },
+    {
+      "id": "tool-browser-zh",
+      "input": "幫我開 browser 再截圖。",
+      "expected_route_kind": "tool_task",
+      "expected_task_profile": "auto"
+    },
+    {
+      "id": "world-date-en",
+      "input": "world events on 2025-03-08",
+      "expected_route_kind": "world_query",
+      "expected_task_profile": "api_reasoning"
+    },
+    {
+      "id": "world-history-en",
+      "input": "world history on 2024-01-01",
+      "expected_route_kind": "world_query",
+      "expected_task_profile": "api_reasoning"
+    },
+    {
+      "id": "world-news-en",
+      "input": "news on 2026-06-01",
+      "expected_route_kind": "world_query",
+      "expected_task_profile": "api_reasoning"
+    },
+    {
+      "id": "world-current-cantonese",
+      "input": "今日發生咩世界大事",
+      "expected_route_kind": "world_query",
+      "expected_task_profile": "api_reasoning"
+    },
+    {
+      "id": "upgrade-benchmark-en",
+      "input": "Run the self-upgrade benchmark harness report.",
+      "expected_route_kind": "self_upgrade",
+      "expected_task_profile": "upgrade"
+    },
+    {
+      "id": "upgrade-regression-en",
+      "input": "Check prompt regression before self upgrade.",
+      "expected_route_kind": "self_upgrade",
+      "expected_task_profile": "upgrade"
+    },
+    {
+      "id": "upgrade-episode-en",
+      "input": "Compare harness episodes for the upgrade report.",
+      "expected_route_kind": "self_upgrade",
+      "expected_task_profile": "upgrade"
+    },
+    {
+      "id": "upgrade-action-cantonese",
+      "input": "執行自我升級",
+      "expected_route_kind": "self_upgrade",
+      "expected_task_profile": "upgrade"
+    },
+    {
+      "id": "forced-firewall",
+      "input": "Inspect this statement.",
+      "pipeline_mode": "firewall",
+      "expected_route_kind": "forced",
+      "expected_task_profile": "auto"
+    },
+    {
+      "id": "forced-news",
+      "input": "Check this topic.",
+      "pipeline_mode": "news",
+      "expected_route_kind": "forced",
+      "expected_task_profile": "auto"
+    },
+    {
+      "id": "forced-tool-workshop",
+      "input": "Design a bounded tool.",
+      "pipeline_mode": "tool_workshop",
+      "expected_route_kind": "forced",
+      "expected_task_profile": "auto"
+    },
+    {
+      "id": "kairos-direct-known-date",
+      "input": "Kairos 2026-03-08 happened what?",
+      "expected_route_kind": "deterministic_memory",
+      "expected_task_profile": "deterministic"
+    }
+  ]
+}

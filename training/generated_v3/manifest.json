@@ -1,0 +1,45 @@
+{
+  "schema_version": "uruk_controller_dataset_manifest.v1",
+  "generated_at": "2026-06-07T13:49:43+00:00",
+  "example_count": 232,
+  "split_counts": {
+    "test": 38,
+    "train": 169,
+    "validation": 25
+  },
+  "route_counts": {
+    "code_task": 21,
+    "deep_reasoning": 65,
+    "deterministic_memory": 7,
+    "forced": 13,
+    "self_upgrade": 15,
+    "small_task": 62,
+    "tool_task": 28,
+    "world_query": 21
+  },
+  "source_counts": {
+    "approved_factory": 44,
+    "contrast_set": 136,
+    "coordinate_benchmark": 11,
+    "seed": 38,
+    "stability_golden": 3
+  },
+  "privacy_policy": {
+    "raw_harness_episodes_included_only_when_training_approved": true,
+    "shadow_cases_included_only_after_review_approval": true,
+    "shadow_inputs_are_sanitized_before_queueing": true,
+    "answers_and_kairos_content_excluded": true
+  },
+  "source_stats": {
+    "seed_loaded": 38,
+    "contrast_set_loaded": 140,
+    "coordinate_benchmark_loaded": 11,
+    "stability_golden_loaded": 5,
+    "episodes_scanned": 47,
+    "episodes_skipped_not_approved": 47,
+    "learning_candidates_scanned": 44,
+    "approved_learning_candidates_loaded": 44
+  },
+  "build_issues": [],
+  "deduplicated_source_count": 232
+}

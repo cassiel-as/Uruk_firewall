@@ -1,0 +1,23 @@
+name: URL 拆解
+description: Fetch URL 內容 + 用 URUK 八律分析 hidden coordinate / cost / framing
+trigger_cue: 用戶 paste 一條 URL，或者 ask「analyze this link / 拆解呢條 link / fetch + audit」
+action_type: tool_call
+tool_calls:
+  - tool: fetch_url
+    params:
+      url: '{{detected_url}}'
+prompt_template: |
+  以下係 fetched URL 嘅內容（{{tool_count}} 條 source）：
+  
+  {{tool_results}}
+  
+  用 URUK 八律 audit 嗰個 source：
+    - 律六（哲學）：未申報嘅 axiom 係咩？
+    - 律三（物理）：claim 有冇真實 cost backing？free truth = 警號
+    - 律七（地理）：作者 / publisher 嘅 physical anchor
+    - 律八（宗教）：有冇 mythologize 某個立場為「不可質疑」
+  
+  輸出：3-5 個 hidden coordinate + 1 句 VERDICT（ACCEPT / WEAKEN / REJECT）。
+enabled: true
+source: builtin
+created: 2026-05-14

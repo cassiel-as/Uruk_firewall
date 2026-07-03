@@ -1,0 +1,15 @@
+name: BBC 頭條
+description: 每日總結 BBC 新聞頭條
+trigger_cue: 每朝幫我總結 BBC 新聞頭條
+action_type: tool_call
+tool_calls:
+- tool: web_search
+  params:
+    query: BBC news headlines
+    n: 5
+prompt_template: '請根據以下搜尋結果，總結今日嘅 BBC 新聞頭條，列出主要標題同簡要內容：
+
+  {{tool_results}}'
+enabled: true
+source: user
+created: '2024-07-30'

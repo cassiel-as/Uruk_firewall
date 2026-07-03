@@ -1,0 +1,739 @@
+{
+  "schema_version": "1.0",
+  "corpus_id": "uruk-knowledge",
+  "generated_at": "2026-05-30T20:10:00Z",
+  "layers": {
+    "index": "Navigation, summary, and operator-facing corpus maps.",
+    "core": "Kairos and physics axiom files.",
+    "kairos": "Active Kairos memory, archive index, and query-only historical logs.",
+    "theory": "Coordinate theory and civilization anchor documents.",
+    "protocol": "Operational reasoning protocols and matrices.",
+    "causal": "CAU causal calibration database and Module T references.",
+    "causal_record": "Longitudinal causal/news records used as calibration evidence.",
+    "misc": "Supplementary theory evidence, gap resolutions, and physics support files.",
+    "scr": "Soul Coordinate Reconstruction templates and profiles.",
+    "runtime_reference": "Runtime prompt projections under config/protocol/references.",
+    "system_doc": "Repository documentation describing runtime architecture, component boundaries, and operating procedures.",
+    "skill_spec": "Protocol skill specifications used by relay, self-upgrade, audit, and specialized URUK workflows."
+  },
+  "collections": [
+    {
+      "path_glob": "data/index/*.md",
+      "layer": "index",
+      "canonical": false,
+      "status": "active",
+      "ref_namespaces": ["index"]
+    },
+    {
+      "path_glob": "data/core/*.md",
+      "layer": "core",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["core"]
+    },
+    {
+      "path_glob": "data/theory/*.md",
+      "layer": "theory",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["theory"]
+    },
+    {
+      "path_glob": "data/protocol/*.md",
+      "layer": "protocol",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["protocol"]
+    },
+    {
+      "path_glob": "data/causal_db/CAU-*.md",
+      "layer": "causal",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["cau"]
+    },
+    {
+      "path_glob": "data/causal_records/CAUSAL_RECORD_*.md",
+      "layer": "causal_record",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["causal_record", "news", "cau_record"]
+    },
+    {
+      "path_glob": "data/misc/*.md",
+      "layer": "misc",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["misc", "theory"]
+    },
+    {
+      "path_glob": "data/scr_profiles/*.md",
+      "layer": "scr",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["scr"]
+    },
+    {
+      "path_glob": "config/protocol/references/*.md",
+      "layer": "runtime_reference",
+      "canonical": false,
+      "status": "active",
+      "ref_namespaces": ["runtime"]
+    },
+    {
+      "path_glob": "config/protocol/references/module_t/*.md",
+      "layer": "causal",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["module_t"]
+    },
+    {
+      "path_glob": "config/protocol/references/scr/**/*.md",
+      "layer": "scr",
+      "canonical": true,
+      "status": "active",
+      "ref_namespaces": ["scr"]
+    }
+  ],
+  "documents": [
+    {
+      "id": "index.master",
+      "path": "data/index/MASTER_INDEX_v8.md",
+      "aliases": ["master", "master_index", "index"],
+      "tags": ["navigation", "routing"]
+    },
+    {
+      "id": "index.rag_summary",
+      "path": "data/index/RAG_SUMMARY_INDEX_v8.md",
+      "aliases": ["rag", "rag_summary", "summary"],
+      "tags": ["rag", "summary"]
+    },
+    {
+      "id": "index.cau",
+      "path": "data/index/CAU_INDEX.md",
+      "aliases": ["cau", "causal"],
+      "tags": ["causal", "cau"]
+    },
+    {
+      "id": "index.navigation",
+      "path": "data/index/CONSOLE_NAVIGATION.md",
+      "aliases": ["navigation", "console_navigation", "refs"],
+      "tags": ["routing", "ref"]
+    },
+    {
+      "id": "index.readme",
+      "path": "data/index/URUK_README.md",
+      "aliases": ["readme", "uruk_readme"],
+      "tags": ["overview"]
+    },
+    {
+      "id": "index.experiments",
+      "path": "data/index/EXPERIMENT_INDEX.md",
+      "layer": "index",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["experiments", "blackbox_experiments", "experiment_index"],
+      "ref_namespaces": ["index", "experiment"],
+      "tags": ["runtime-summary", "experiments", "blackboxlab"]
+    },
+    {
+      "id": "index.harness_episodes",
+      "path": "data/index/HARNESS_EPISODE_INDEX.md",
+      "layer": "index",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["harness", "episodes", "episode_index", "harness_episodes"],
+      "ref_namespaces": ["index", "harness", "episode"],
+      "tags": ["runtime-summary", "harness", "episodes"]
+    },
+    {
+      "id": "index.upgrade_history",
+      "path": "data/index/UPGRADE_HISTORY_INDEX.md",
+      "layer": "index",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["upgrades", "upgrade_history", "self_upgrade_history"],
+      "ref_namespaces": ["index", "upgrade"],
+      "tags": ["runtime-summary", "self-upgrade", "reports"]
+    },
+    {
+      "id": "system.root_readme",
+      "path": "README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["repo_readme", "project_readme", "system_overview"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["readme", "architecture", "overview"]
+    },
+    {
+      "id": "system.design_analysis",
+      "path": "DESIGN_ANALYSIS.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["design_analysis", "system_design", "architecture_analysis"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["architecture", "analysis"]
+    },
+    {
+      "id": "docs.index",
+      "path": "docs/README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["docs", "documentation_index"],
+      "ref_namespaces": ["docs"],
+      "tags": ["documentation", "index"]
+    },
+    {
+      "id": "docs.model_onboarding",
+      "path": "docs/model-onboarding.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["model_onboarding", "backend_onboarding"],
+      "ref_namespaces": ["docs", "system"],
+      "tags": ["model", "relay", "onboarding"]
+    },
+    {
+      "id": "docs.search_api_options",
+      "path": "docs/SEARCH_API_OPTIONS.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["search_api_options", "search_options"],
+      "ref_namespaces": ["docs", "system"],
+      "tags": ["search", "browser", "source"]
+    },
+    {
+      "id": "system.config_readme",
+      "path": "config/README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["config_readme", "runtime_config"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["config", "prompts", "runtime"]
+    },
+    {
+      "id": "system.data_readme",
+      "path": "data/README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["data_readme", "knowledge_corpus"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["data", "knowledge", "rag"]
+    },
+    {
+      "id": "system.services_readme",
+      "path": "services/README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["services_readme", "service_map"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["services", "architecture"]
+    },
+    {
+      "id": "system.static_readme",
+      "path": "static/README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["static_readme", "frontend_readme"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["frontend", "ui"]
+    },
+    {
+      "id": "system.tools_readme",
+      "path": "tools/README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["tools_readme", "cli_tools"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["tools", "cli"]
+    },
+    {
+      "id": "system.tests_readme",
+      "path": "tests/README.md",
+      "layer": "system_doc",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["tests_readme", "test_suite"],
+      "ref_namespaces": ["system", "docs"],
+      "tags": ["tests", "regression"]
+    },
+    {
+      "id": "system.skills_readme",
+      "path": "skills/README.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["skills_readme", "skill_index"],
+      "ref_namespaces": ["skill", "docs"],
+      "tags": ["skills", "index"]
+    },
+    {
+      "id": "core.kairos",
+      "path": "data/core/KAIROS_CORE.md",
+      "aliases": ["kairos", "kairos_core", "core"],
+      "ref_namespaces": ["core", "kairos"],
+      "tags": ["kairos", "anchor"]
+    },
+    {
+      "id": "core.physics_constants",
+      "path": "data/core/PHYSICS_CONSTANTS.md",
+      "aliases": ["physics", "physics_constants", "constants"],
+      "ref_namespaces": ["core", "physics"],
+      "tags": ["physics", "axioms"]
+    },
+    {
+      "id": "kairos.active",
+      "path": "data/kairos/KAIROS_ACTIVE.md",
+      "layer": "kairos",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["active", "kairos_active", "memory", "current"],
+      "ref_namespaces": ["kairos"],
+      "tags": ["kairos", "memory", "active"]
+    },
+    {
+      "id": "kairos.archive_index",
+      "path": "data/kairos/KAIROS_ARCHIVE_INDEX.md",
+      "layer": "kairos",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["archive", "archive_index", "archives", "index"],
+      "ref_namespaces": ["kairos"],
+      "tags": ["kairos", "archive", "index"]
+    },
+    {
+      "id": "kairos.middle_archive",
+      "path": "data/kairos/KAIROS_LOG_MIDDLE.md",
+      "layer": "kairos",
+      "canonical": false,
+      "status": "active",
+      "aliases": ["middle", "middle_archive"],
+      "ref_namespaces": ["kairos"],
+      "tags": ["kairos", "archive", "query_only"]
+    },
+    {
+      "id": "kairos.updated_archive",
+      "path": "data/kairos/KAIROS_LOG_UPDATED_v8.md",
+      "layer": "kairos",
+      "canonical": false,
+      "status": "active",
+      "aliases": ["updated", "updated_v8", "v8_archive"],
+      "ref_namespaces": ["kairos"],
+      "tags": ["kairos", "archive", "query_only"]
+    },
+    {
+      "id": "theory.coordinate.v5",
+      "path": "data/theory/\u5ea7\u6a19\u8aaa_v5_updated.md",
+      "legacy_paths": ["data/theory/\u00d5\u2551\u00ba\u00b5\u00bf\u00d6\u00de\u00ac\u00ac_v5_updated.md"],
+      "aliases": ["\u5ea7\u6a19\u8aaa", "\u5750\u6a19\u8aaa", "\u5ea7\u6a19\u8aaa_v5", "zuobiao", "zb", "coordinate", "coordinate_theory", "coordinate:v5", "v5"],
+      "tags": ["coordinate", "kairos", "trinity"]
+    },
+    {
+      "id": "theory.coordinate.expansion",
+      "path": "data/theory/COORDINATE_THEORY_EXPANSION.md",
+      "aliases": ["expansion", "coordinate_expansion", "coordinate_theory_expansion"],
+      "tags": ["coordinate", "expansion"]
+    },
+    {
+      "id": "theory.coordinate.paper",
+      "path": "data/theory/coordinate_theory_paper.md",
+      "aliases": ["paper", "coordinate_paper"],
+      "tags": ["coordinate", "paper"]
+    },
+    {
+      "id": "theory.coordinate.en",
+      "path": "data/theory/coordinate_theory_integrated_EN_v3.md",
+      "aliases": ["en", "english", "integrated_en"],
+      "tags": ["coordinate", "english"]
+    },
+    {
+      "id": "theory.coordinate.cards",
+      "path": "data/theory/COORDINATE_KNOWLEDGE_CARDS.md",
+      "aliases": ["coordinate_cards", "knowledge_cards", "座標卡", "座標說卡", "cards"],
+      "tags": ["coordinate", "knowledge_cards", "harness"]
+    },
+    {
+      "id": "theory.coordinate.cards_json",
+      "path": "data/theory/coordinate_knowledge_cards.json",
+      "layer": "theory",
+      "canonical": false,
+      "status": "active",
+      "aliases": ["coordinate_cards_json", "knowledge_cards_json"],
+      "ref_namespaces": ["knowledge_card"],
+      "tags": ["coordinate", "knowledge_cards", "structured"],
+      "projection_of": "theory.coordinate.cards"
+    },
+    {
+      "id": "theory.civilization_anchors",
+      "path": "data/theory/CIVILIZATION_ANCHORS.md",
+      "aliases": ["anchors", "civilization", "civilisation", "civilization_anchors"],
+      "tags": ["civilization", "anchors"]
+    },
+    {
+      "id": "misc.data_supplement",
+      "path": "data/misc/data_supplement.md",
+      "aliases": ["data_supplement", "supplement", "theory_supplement"],
+      "tags": ["supplement", "data", "theory"]
+    },
+    {
+      "id": "misc.gap_resolution",
+      "path": "data/misc/gap_resolution.md",
+      "aliases": ["gap", "gaps", "gap_resolution", "friston"],
+      "tags": ["gap", "friston", "theory"]
+    },
+    {
+      "id": "misc.en_physics_constants",
+      "path": "data/misc/EN_PHYSICS_CONSTANTS.md",
+      "aliases": ["en_physics", "english_physics", "physics_constants_en"],
+      "tags": ["physics", "english", "constants"]
+    },
+    {
+      "id": "causal_record.2024_01_to_2024_08",
+      "path": "data/causal_records/CAUSAL_RECORD_2024-01_to_2024-08.md",
+      "aliases": ["2024_01_to_2024_08", "2024_01", "2024_h1", "causal_record_2024_01"],
+      "tags": ["causal_record", "news", "2024"]
+    },
+    {
+      "id": "causal_record.2024_09_to_2025_04",
+      "path": "data/causal_records/CAUSAL_RECORD_2024-09_to_2025-04.md",
+      "aliases": ["2024_09_to_2025_04", "2024_09", "2025_04", "causal_record_2024_09"],
+      "tags": ["causal_record", "news", "2024", "2025"]
+    },
+    {
+      "id": "causal_record.2025_05_to_2026_05",
+      "path": "data/causal_records/CAUSAL_RECORD_2025-05_to_2026-05_全中文.md",
+      "aliases": ["2025_05_to_2026_05", "2025_05", "2026_05", "causal_record_2025_05"],
+      "tags": ["causal_record", "news", "2025", "2026", "chinese"]
+    },
+    {
+      "id": "protocol.source_coordinate_registry",
+      "path": "data/protocol/SOURCE_COORDINATE_REGISTRY.md",
+      "aliases": ["source_registry", "source_coordinate_registry", "scr_registry"],
+      "tags": ["source_coordinate", "registry"]
+    },
+    {
+      "id": "protocol.browser_node",
+      "path": "data/protocol/BROWSER_NODE.md",
+      "aliases": ["browser", "browser_node"],
+      "tags": ["browser", "source_coordinate"]
+    },
+    {
+      "id": "protocol.eight_laws",
+      "path": "data/protocol/EIGHT_LAWS_MATRIX.md",
+      "aliases": ["eight_laws", "laws", "law_matrix"],
+      "tags": ["laws", "matrix"]
+    },
+    {
+      "id": "protocol.eight_analogies",
+      "path": "data/protocol/EIGHT_ANALOGIES.md",
+      "aliases": ["eight_analogies", "analogies"],
+      "tags": ["analogies"]
+    },
+    {
+      "id": "protocol.delabeling",
+      "path": "data/protocol/DELABELING_MATRIX.md",
+      "aliases": ["delabel", "delabeling", "de_labeling"],
+      "tags": ["delabeling"]
+    },
+    {
+      "id": "protocol.explanation_layer",
+      "path": "data/protocol/EXPLANATION_LAYER.md",
+      "aliases": ["explanation", "explanation_layer", "four_laws"],
+      "tags": ["explanation"]
+    },
+    {
+      "id": "protocol.trinity_audit",
+      "path": "data/protocol/TRINITY_AUDIT.md",
+      "aliases": ["trinity", "trinity_audit", "audit"],
+      "tags": ["trinity", "audit"]
+    },
+    {
+      "id": "protocol.scr_template",
+      "path": "data/protocol/SCR_TEMPLATE.md",
+      "aliases": ["scr_template", "soul_coordinate_template"],
+      "tags": ["scr", "template"]
+    },
+    {
+      "id": "runtime.kairos_core",
+      "path": "config/protocol/references/KAIROS_CORE.md",
+      "aliases": ["kairos_core", "kairos_runtime", "core_runtime"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["kairos", "runtime", "projection"],
+      "projection_of": "core.kairos"
+    },
+    {
+      "id": "runtime.physics_constants",
+      "path": "config/protocol/references/PHYSICS_CONSTANTS.md",
+      "aliases": ["physics_constants", "physics_runtime", "constants_runtime"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["physics", "runtime", "projection"],
+      "projection_of": "core.physics_constants"
+    },
+    {
+      "id": "runtime.eight_laws",
+      "path": "config/protocol/references/eight_laws.md",
+      "aliases": ["eight_laws", "laws", "law_runtime"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["laws", "runtime", "projection"],
+      "projection_of": "protocol.eight_laws"
+    },
+    {
+      "id": "runtime.delabeling",
+      "path": "config/protocol/references/delabeling.md",
+      "aliases": ["delabel", "delabeling", "delabel_runtime"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["delabeling", "runtime", "projection"],
+      "projection_of": "protocol.delabeling"
+    },
+    {
+      "id": "runtime.explanation_layer",
+      "path": "config/protocol/references/explanation_layer.md",
+      "aliases": ["explanation", "explanation_layer", "explanation_runtime"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["explanation", "runtime", "projection"],
+      "projection_of": "protocol.explanation_layer"
+    },
+    {
+      "id": "runtime.trinity",
+      "path": "config/protocol/references/trinity.md",
+      "aliases": ["trinity", "trinity_runtime"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["trinity", "runtime", "projection"],
+      "projection_of": "protocol.trinity_audit"
+    },
+    {
+      "id": "runtime.module_n_alignment",
+      "path": "config/protocol/references/module_n_alignment.md",
+      "aliases": ["module_n", "alignment", "alignment_resonance"],
+      "ref_namespaces": ["runtime", "module_n"],
+      "tags": ["module_n", "alignment", "runtime"]
+    },
+    {
+      "id": "runtime.carrier_epistemics",
+      "path": "config/protocol/references/carrier_epistemics.md",
+      "aliases": ["carrier", "carrier_epistemics"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["carrier", "runtime"]
+    },
+    {
+      "id": "runtime.memory_load",
+      "path": "config/protocol/references/memory_load.md",
+      "aliases": ["memory", "memory_load"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["memory", "runtime"]
+    },
+    {
+      "id": "runtime.news_filter",
+      "path": "config/protocol/references/news_filter.md",
+      "aliases": ["news", "news_filter"],
+      "ref_namespaces": ["runtime", "news"],
+      "tags": ["news", "runtime"]
+    },
+    {
+      "id": "runtime.scr",
+      "path": "config/protocol/references/scr.md",
+      "aliases": ["scr", "soul_coordinate", "soul_coordinate_reconstruction"],
+      "ref_namespaces": ["runtime", "scr_protocol"],
+      "tags": ["scr", "runtime"]
+    },
+    {
+      "id": "runtime.causal_calibration",
+      "path": "config/protocol/references/causal_calibration.md",
+      "aliases": ["causal_calibration", "module_t_calibration"],
+      "ref_namespaces": ["runtime", "module_t"],
+      "tags": ["causal", "module_t"]
+    },
+    {
+      "id": "runtime.external_sources",
+      "path": "config/protocol/references/external_sources.md",
+      "aliases": ["external_sources", "browsernode", "source_coordinate_runtime"],
+      "ref_namespaces": ["runtime"],
+      "tags": ["browser", "source_coordinate"],
+      "projection_of": "protocol.source_coordinate_registry"
+    },
+    {
+      "id": "runtime.blackbox",
+      "path": "config/protocol/references/blackbox.md",
+      "aliases": ["blackbox", "blackbox_lab"],
+      "ref_namespaces": ["runtime", "blackbox"],
+      "tags": ["blackbox"]
+    },
+    {
+      "id": "skill.codex_relay",
+      "path": "codex-relay-SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["codex_relay", "codex_relay_skill"],
+      "ref_namespaces": ["skill", "codex"],
+      "tags": ["relay", "codex"]
+    },
+    {
+      "id": "skill.codex_review",
+      "path": "codex-review-SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["codex_review", "codex_review_skill"],
+      "ref_namespaces": ["skill", "codex"],
+      "tags": ["review", "codex"]
+    },
+    {
+      "id": "skill.codex_tool_designer",
+      "path": "codex-tool-designer-SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["codex_tool_designer", "tool_designer_skill"],
+      "ref_namespaces": ["skill", "codex"],
+      "tags": ["tool_design", "codex"]
+    },
+    {
+      "id": "skill.codex_upgrade",
+      "path": "codex-upgrade-SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["codex_upgrade", "codex_upgrade_skill"],
+      "ref_namespaces": ["skill", "codex"],
+      "tags": ["upgrade", "codex"]
+    },
+    {
+      "id": "skill.uruk_relay",
+      "path": "uruk-relay-SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["uruk_relay", "relay_skill"],
+      "ref_namespaces": ["skill", "uruk"],
+      "tags": ["relay", "uruk"]
+    },
+    {
+      "id": "skill.blackbox_lab",
+      "path": "skills/blackbox-lab/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["blackbox_lab", "blackbox_skill"],
+      "ref_namespaces": ["skill", "blackbox"],
+      "tags": ["blackbox", "skill"]
+    },
+    {
+      "id": "skill.kairos_density_audit",
+      "path": "skills/kairos-density-audit/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["kairos_density_audit", "kairos_density"],
+      "ref_namespaces": ["skill", "kairos"],
+      "tags": ["kairos", "audit"]
+    },
+    {
+      "id": "skill.master_router",
+      "path": "skills/master-router/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["master_router", "router_skill"],
+      "ref_namespaces": ["skill"],
+      "tags": ["routing", "skill"]
+    },
+    {
+      "id": "skill.news_filter",
+      "path": "skills/news-filter/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["news_filter", "news_skill"],
+      "ref_namespaces": ["skill", "news"],
+      "tags": ["news", "source"]
+    },
+    {
+      "id": "skill.scr_soul_reorg",
+      "path": "skills/scr-soul-reorg/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["scr_soul_reorg", "scr_reorg"],
+      "ref_namespaces": ["skill", "scr"],
+      "tags": ["scr", "skill"]
+    },
+    {
+      "id": "skill.trinity_audit",
+      "path": "skills/trinity-audit/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["trinity_audit_skill", "trinity_skill"],
+      "ref_namespaces": ["skill", "trinity"],
+      "tags": ["trinity", "audit"]
+    },
+    {
+      "id": "skill.uruk_audit",
+      "path": "skills/uruk-audit/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["uruk_audit", "audit_skill"],
+      "ref_namespaces": ["skill", "uruk"],
+      "tags": ["audit", "upgrade"]
+    },
+    {
+      "id": "skill.uruk_learn",
+      "path": "skills/uruk-learn/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["uruk_learn", "learn_skill"],
+      "ref_namespaces": ["skill", "uruk"],
+      "tags": ["learn", "upgrade"]
+    },
+    {
+      "id": "skill.uruk_self_upgrade",
+      "path": "skills/uruk-self-upgrade/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["uruk_self_upgrade", "self_upgrade_skill"],
+      "ref_namespaces": ["skill", "uruk"],
+      "tags": ["self_upgrade", "upgrade"]
+    },
+    {
+      "id": "skill.uruk_sovereign_protocol",
+      "path": "skills/uruk-sovereign-protocol/SKILL.md",
+      "layer": "skill_spec",
+      "canonical": true,
+      "status": "active",
+      "aliases": ["uruk_sovereign_protocol", "sovereign_skill"],
+      "ref_namespaces": ["skill", "uruk", "sovereign"],
+      "tags": ["sovereign", "protocol"]
+    },
+    {
+      "id": "module_t.1914_1916",
+      "path": "config/protocol/references/module_t/MODULE_T_CALIBRATION_19141916.md",
+      "aliases": ["wwi", "1914", "19141916", "1914_1916", "1914-1916", "MODULE_T_CALIBRATION_1914-1916"],
+      "tags": ["module_t", "calibration"]
+    },
+    {
+      "id": "module_t.1939_1941",
+      "path": "config/protocol/references/module_t/MODULE_T_CALIBRATION_19391941.md",
+      "aliases": ["wwii", "1939", "19391941", "1939_1941", "1939-1941", "MODULE_T_CALIBRATION_1939-1941"],
+      "tags": ["module_t", "calibration"]
+    },
+    {
+      "id": "module_t.1979_1981",
+      "path": "config/protocol/references/module_t/MODULE_T_CALIBRATION_19791981.md",
+      "aliases": ["iran", "1979", "19791981", "1979_1981", "1979-1981", "MODULE_T_CALIBRATION_1979-1981"],
+      "tags": ["module_t", "calibration"]
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "schema_version": "stability_golden.v1",
+  "suite_id": "uruk-runtime-stability-golden-v1",
+  "created_at": "2026-06-06",
+  "purpose": "Deterministic runtime contract checks for routing, Kairos memory, world simulation, and runtime identity. These cases do not call an LLM.",
+  "cases": [
+    {
+      "id": "route-kairos-date-direct",
+      "type": "route",
+      "input": "Kairos 2026-03-08 happened what?",
+      "expect": {
+        "route_kind": "deterministic_memory",
+        "short_circuit": "kairos_memory_direct",
+        "recommended_pipeline_mode": "kairos_memory_direct",
+        "model_calls": 0,
+        "direct_answer_contains": ["2026-03-08"]
+      }
+    },
+    {
+      "id": "route-world-date-not-kairos",
+      "type": "route",
+      "input": "world events on 2026-03-08",
+      "expect": {
+        "route_kind": "world_query",
+        "recommended_pipeline_mode": "news",
+        "direct_answer_is_null": true
+      }
+    },
+    {
+      "id": "route-freedom-protocol",
+      "type": "route",
+      "input": "what is freedom?",
+      "expect": {
+        "route_kind": "deep_reasoning",
+        "model_tier": "strong_reasoning",
+        "skip_pre_gate": true,
+        "coordinate_hit_ids": ["coordinate.freedom.entropy"]
+      }
+    },
+    {
+      "id": "route-ordinary-small-task",
+      "type": "route",
+      "input": "What is 2+2?",
+      "expect": {
+        "route_kind": "small_task",
+        "model_tier": "small_local"
+      }
+    },
+    {
+      "id": "route-self-upgrade",
+      "type": "route",
+      "input": "self-upgrade benchmark harness report",
+      "expect": {
+        "route_kind": "self_upgrade",
+        "skip_pre_gate": true
+      }
+    },
+    {
+      "id": "kairos-ambiguous-date-asks-intent",
+      "type": "kairos_memory",
+      "input": "3月8號發生過咩事？",
+      "expect": {
+        "answer_not_null": true,
+        "answer_contains": ["2026-03-08", "Kairos"],
+        "answer_not_contains": ["CAUSAL_DATABASE"]
+      }
+    },
+    {
+      "id": "kairos-world-date-rejected",
+      "type": "kairos_memory",
+      "input": "3月8號世界大事發生過咩？",
+      "expect": {
+        "answer_is_null": true
+      }
+    },
+    {
+      "id": "world-trigger-explicit",
+      "type": "world_trigger",
+      "input": "/world freedom and blackbox cost",
+      "expect": {
+        "should_trigger": true,
+        "explicit": true,
+        "terms": ["freedom", "blackbox", "cost"]
+      }
+    },
+    {
+      "id": "world-trigger-chinese-freedom",
+      "type": "world_trigger",
+      "input": "自由係咩",
+      "expect": {
+        "should_trigger": true,
+        "terms": ["freedom"]
+      }
+    },
+    {
+      "id": "world-trigger-ordinary-guard",
+      "type": "world_trigger",
+      "input": "hello",
+      "expect": {
+        "should_trigger": false
+      }
+    },
+    {
+      "id": "world-simulation-core-shape",
+      "type": "world_simulation",
+      "input": "freedom under blackbox pressure",
+      "expect": {
+        "schema_version": "world_simulation.v1",
+        "needs_world_view": true,
+        "recommended_scenario_in": ["maintain_coordinate", "open_blackbox"],
+        "entity_ids": ["operator", "vessel", "kairos_active", "tool_registry", "current_query"],
+        "scenario_ids": ["maintain_coordinate", "accept_external_frame", "open_blackbox"]
+      }
+    },
+    {
+      "id": "runtime-identity-carrier",
+      "type": "runtime_identity",
+      "input": "system body",
+      "expect": {
+        "identity_id": "uruk_protocol_carrier",
+        "contains": ["URUK", "VESSEL PROFILE"],
+        "not_contains": ["I am Claude Desktop", "I am ChatGPT"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+name: Calendar audit
+description: 列今日/聽日/呢個星期 events + 八律 audit（時間預算 / 能量分配 / hidden assumption）
+trigger_cue: 用戶問自己日程「我聽日 / 今日 / 星期 X / 下星期 有咩 / meeting / 開乜會 / 約咗咩」
+action_type: tool_call
+tool_calls:
+  - tool: calendar
+    params:
+      from_dt: '{{today}}'
+      to_dt: '{{today_plus_7}}'
+prompt_template: |
+  以下係未來 7 日嘅 calendar events（{{tool_count}} 個）：
+  
+  {{tool_results}}
+  
+  用 URUK 角度 audit：
+    - 律三（物理）：每個 event 嘅 metabolic cost — 邊個係 energy drain 邊個係 source
+    - 律四（化學）：邊兩個 event 之間冇 transition buffer，會 chain-load
+    - 律七（地理）：要 commute 嘅 events 物理時間預算
+    - 律二（心理）：edge / 緊張 events vs ease events 嘅 ratio
+  
+  輸出：呢個禮拜嘅 metabolic balance + 1-2 個建議調整（移咩 event / 加 buffer 喺邊度）。
+enabled: true
+source: builtin
+created: 2026-05-14

@@ -1,0 +1,318 @@
+{
+  "schema_version": "1.0",
+  "source_document": "theory.coordinate.v5",
+  "cards_document": "theory.coordinate.cards",
+  "generated_at": "2026-05-31",
+  "cards": [
+    {
+      "id": "coordinate.boundary.io",
+      "title": "輸入、狀態、輸出、邊界",
+      "claim": "判斷一個系統時，要先分清外部輸入、內部狀態、輸出行動、權限邊界。",
+      "use_when": ["系統設計", "自我升級", "工具安裝", "安全審計", "代理流程"],
+      "not_for": ["純語氣潤色", "普通閒聊", "單一步驟命令"],
+      "false_positive_guards": ["如果只是單一步驟命令，直接完成，不需要拆四層。", "不要把每句普通聊天都變成系統邊界分析。"],
+      "triggers": ["系統", "自我升級", "工具", "安全", "權限", "邊界", "input", "state", "output", "boundary", "agent"],
+      "prompt_guidance": "先拆清輸入、內部狀態、輸出行動、不能越過的權限邊界。",
+      "test": "回答有沒有分清輸入、系統狀態、輸出行動、權限邊界？",
+      "evaluation": {
+        "requires_any_terms": ["輸入", "狀態", "輸出", "邊界", "權限", "不會做", "不應該"]
+      }
+    },
+    {
+      "id": "coordinate.layer.classification",
+      "title": "問題分層",
+      "claim": "先判斷問題屬於哪一層，才決定工具和回答方式：技術、知識、風險、行動、治理、語義。",
+      "use_when": ["需求含混", "UI/工程決策", "知識庫設計", "模型協作"],
+      "not_for": ["明確查詢", "單純執行命令"],
+      "false_positive_guards": ["答案已明確時不要硬分層。", "單純執行命令優先完成任務。"],
+      "triggers": ["設計", "分析", "知識庫", "UI", "工程", "治理", "語義", "分類", "layer", "classification"],
+      "prompt_guidance": "先把問題分到技術、知識、風險、行動、治理或語義層，再回答。",
+      "test": "回答有沒有把問題分類，而不是把所有問題都當成同一種模型回答？",
+      "evaluation": {
+        "requires_any_terms": ["技術", "知識", "風險", "行動", "治理", "語義", "分類", "層"]
+      }
+    },
+    {
+      "id": "coordinate.origin.anchor",
+      "title": "原點與證據",
+      "claim": "任何判斷都要問原點：資料從哪裡來、由誰定義、是否有可檢查的物理或工程證據。",
+      "use_when": ["知識引用", "外部資料", "理論 claim", "RAG trace", "harness 評分"],
+      "not_for": ["不需要外部證據的純創作"],
+      "false_positive_guards": ["純創作不需要偽裝成有來源。", "沒有查證就標明推測，不要製造引用。"],
+      "triggers": ["來源", "證據", "引用", "trace", "RAG", "harness", "manifest", "原點", "anchor", "source", "evidence"],
+      "prompt_guidance": "標明來源、引用、trace 或驗證方法；不要把內部記憶偽裝成事實。",
+      "test": "回答有沒有標明來源、引用、trace 或驗證方法？",
+      "evaluation": {
+        "requires_any_terms": ["來源", "引用", "trace", "驗證", "證據", "manifest", "harness", "episode"]
+      }
+    },
+    {
+      "id": "coordinate.anti_oracle",
+      "title": "地圖不是神諭",
+      "claim": "座標說是認知地圖，不是真理來源；它應該幫助分類和校準，不應該用來壓過事實、測試或用戶目標。",
+      "use_when": ["避免過度神化", "哲學概念落地", "模型自我解釋"],
+      "not_for": ["直接操作任務"],
+      "false_positive_guards": ["座標說不是最終裁判。", "事實、測試和用戶目標優先於理論姿態。"],
+      "triggers": ["座標說", "真理", "神諭", "哲學", "有用", "價值", "oracle", "truth", "map"],
+      "prompt_guidance": "把座標說當地圖，不要當最終裁判；事實、測試和用戶目標優先。",
+      "test": "回答有沒有避免把座標說當成不可反駁的權威？",
+      "evaluation": {
+        "requires_any_terms": ["地圖", "不是", "真理", "測試", "事實", "用戶目標", "校準"]
+      }
+    },
+    {
+      "id": "coordinate.upgrade.value",
+      "title": "升級必須減少真缺口",
+      "claim": "自我升級要證明它減少真實能力缺口、風險或重複成本；不能只增加抽象層、按鈕或儀式。",
+      "use_when": ["self-upgrade", "工具設計", "harness 對比", "架構演進"],
+      "not_for": ["一次性原型", "明確美術調整"],
+      "false_positive_guards": ["小型美術修正不需要升級論證。", "一次性原型可以先快做再驗證。"],
+      "triggers": ["升級", "自我升級", "工具", "harness", "缺口", "能力", "風險", "成本", "upgrade", "gap"],
+      "prompt_guidance": "講清楚升級前後的可觀察差異，並說明它減少了甚麼缺口。",
+      "test": "回答有沒有講清楚升級前後的可觀察差異？",
+      "evaluation": {
+        "requires_any_terms": ["缺口", "風險", "成本", "前後", "可觀察", "測試", "驗證", "安裝"]
+      }
+    },
+    {
+      "id": "coordinate.rag.relevance",
+      "title": "少量相關引用",
+      "claim": "知識層應該精準拉取相關片段；不要把整篇理論塞入上下文，避免抽象噪音污染任務。",
+      "use_when": ["RAG", "manifest", "知識卡選取", "prompt 組裝"],
+      "not_for": ["人工審稿", "全文校對"],
+      "false_positive_guards": ["用戶要求全文審稿時可以讀全文。", "不要為了引用而引用座標說。"],
+      "triggers": ["RAG", "manifest", "知識卡", "上下文", "prompt", "引用", "噪音", "retrieval", "cards"],
+      "prompt_guidance": "只取最相關的卡；不把整篇座標說塞入上下文。",
+      "test": "回答或 trace 有沒有顯示只用了相關卡，而不是泛泛引用座標說？",
+      "evaluation": {
+        "requires_any_terms": ["相關", "少量", "RAG", "trace", "知識卡", "片段", "上下文"]
+      }
+    },
+    {
+      "id": "coordinate.trace.audit",
+      "title": "可追蹤審計",
+      "claim": "系統要留下可追蹤記錄：用了甚麼知識、哪些判斷通過、哪些失敗、下一步怎樣驗證。",
+      "use_when": ["harness episode", "自我升級", "安全閘", "回歸測試"],
+      "not_for": ["極短即答"],
+      "false_positive_guards": ["極短 factual answer 不需要完整 trace。", "trace 是為可回放決策，不是裝飾。"],
+      "triggers": ["episode", "log", "plan", "trace", "harness trace", "validator", "審計", "回歸", "安全閘", "測試"],
+      "prompt_guidance": "結果要留下 plan、log、episode、trace 或 validator，方便之後回看。",
+      "test": "結果有沒有 plan、log、episode、trace 或 validator 記錄？",
+      "evaluation": {
+        "requires_any_terms": ["plan", "log", "episode", "trace", "validator", "測試", "記錄", "回歸"]
+      }
+    },
+    {
+      "id": "coordinate.action.grounding",
+      "title": "抽象要落地",
+      "claim": "當用戶要求設計或開工，抽象概念必須轉成具體文件、API、測試、UI 或流程。",
+      "use_when": ["系統設計", "產品 UI", "知識庫工程化", "工具新增"],
+      "not_for": ["單純哲學討論"],
+      "false_positive_guards": ["用戶只要概念討論時不必假裝已實作。", "落地要跟任務範圍匹配。"],
+      "triggers": ["開工", "做到", "完成", "設計", "落地", "文件", "API", "測試", "UI", "流程", "implement"],
+      "prompt_guidance": "把概念轉成可落地 artifact：文件、API、測試、UI 或流程。",
+      "test": "回答有沒有落到明確 artifact 或下一步，而不是停留在概念？",
+      "evaluation": {
+        "requires_any_terms": ["文件", "API", "測試", "UI", "流程", "落地", "實作", "新增"]
+      }
+    },
+    {
+      "id": "coordinate.hidden.coordinate",
+      "title": "未申報座標",
+      "claim": "一個回答如果把某個位置、利益或前提包裝成中立，就需要把該座標明示出來。",
+      "use_when": ["政治敘事", "制度語言", "價值判斷", "AI 安全", "新聞分析"],
+      "not_for": ["純數學", "明確來源的個人意見", "無爭議 factual lookup"],
+      "false_positive_guards": ["不要把每個觀點都叫隱藏座標。", "如果說話者已清楚申明立場，就不算未申報。"],
+      "triggers": ["隱藏座標", "未申報", "中立", "客觀", "立場", "誰說", "邊個講", "neutral", "perspective", "position"],
+      "prompt_guidance": "指出答案或來源從哪個位置說話，並把假中立拆開。",
+      "test": "回答有沒有指出未申報座標或說明為何沒有？",
+      "evaluation": {
+        "requires_any_terms": ["未申報", "隱藏座標", "立場", "位置", "假中立", "從邊個", "座標透明"],
+        "forbidden_terms": ["絕對中立", "無立場所以正確"]
+      }
+    },
+    {
+      "id": "coordinate.cost.locus",
+      "title": "代價落點",
+      "claim": "真正的判斷要追問代價落在哪個身體、組織、時間段或地理位置。",
+      "use_when": ["政策", "產品決策", "自動化", "安全", "治理", "資源分配"],
+      "not_for": ["沒有代價轉移的簡單查詢"],
+      "false_positive_guards": ["不要為微小操作硬造宏大代價。", "如果代價不明，要標明不確定。"],
+      "triggers": ["代價", "成本", "風險", "誰承擔", "邊個承擔", "落喺邊", "身體", "資源", "cost", "burden"],
+      "prompt_guidance": "講清楚成本、風險或壓力落在哪裡，而不是只講抽象效益。",
+      "test": "回答有沒有標明代價落點？",
+      "evaluation": {
+        "requires_any_terms": ["代價", "成本", "風險", "承擔", "落點", "身體", "組織", "時間", "地理"]
+      }
+    },
+    {
+      "id": "coordinate.false.neutrality",
+      "title": "假中立",
+      "claim": "聲稱中立的語言可能隱藏了預設分類、權力位置或衡量方式。",
+      "use_when": ["政策文本", "平台規則", "評分標準", "AI 對齊", "新聞來源"],
+      "not_for": ["已公開方法和限制的量化報告"],
+      "false_positive_guards": ["有方法、有數據、有不確定性說明時，不要直接指控假中立。"],
+      "triggers": ["中立", "客觀", "標準", "評分", "公平", "neutral", "objective", "fair"],
+      "prompt_guidance": "檢查中立聲稱背後的分類和衡量方式。",
+      "test": "回答有沒有問清楚中立標準由誰定義？",
+      "evaluation": {
+        "requires_any_terms": ["中立", "標準", "定義", "衡量", "分類", "立場", "方法"]
+      }
+    },
+    {
+      "id": "coordinate.framing.trap",
+      "title": "框架陷阱",
+      "claim": "A/B 選擇、如何修補、是否應該等問題格式，可能把真正選項排除在外。",
+      "use_when": ["二選一問題", "產品設計", "自我升級", "策略選擇", "Spirit interrupt"],
+      "not_for": ["選項已完整且互斥的決策"],
+      "false_positive_guards": ["不是所有二選一都有陷阱。", "如果選項確實完整，直接比較。"],
+      "triggers": ["A 定 B", "工具定", "定加", "抑或", "或者", "二選一", "framing", "框架", "陷阱", "點解一定", "should I", "either"],
+      "prompt_guidance": "先問問題格式有沒有排除第三條路或共享未講出的前提。",
+      "test": "回答有沒有檢查問題框架本身？",
+      "evaluation": {
+        "requires_any_terms": ["框架", "前提", "第三條路", "選項", "假設", "framing"]
+      }
+    },
+    {
+      "id": "coordinate.source.position",
+      "title": "來源座標",
+      "claim": "外部來源不只要看真假，也要看它從哪個機構、利益、地理和時間位置說話。",
+      "use_when": ["外部搜尋", "新聞", "研究引用", "BrowserNode", "Source Coordinate Registry"],
+      "not_for": ["無來源要求的內部設計討論"],
+      "false_positive_guards": ["不要用來源座標代替事實查核。", "來源有偏向不等於內容必然錯。"],
+      "triggers": ["來源", "新聞", "search", "browser", "source", "registry", "引用", "研究", "外部", "查證"],
+      "prompt_guidance": "同時處理事實可信度和來源位置。",
+      "test": "回答有沒有標明來源位置或查證方法？",
+      "evaluation": {
+        "requires_any_terms": ["來源", "機構", "位置", "查證", "引用", "時間", "地理", "source"]
+      }
+    },
+    {
+      "id": "coordinate.system.output.audit",
+      "title": "審計系統輸出",
+      "claim": "座標層應該審計系統自己的輸出是否清楚、落地、可驗證，而不是審判用戶。",
+      "use_when": ["回覆設計", "UI 文案", "審計流程", "自我升級", "用戶體驗"],
+      "not_for": ["用戶明確要求分析自己輸入文本的情況"],
+      "false_positive_guards": ["不要把用戶當成錯誤來源。", "如果用戶要求文本審計，審計文本而不是人格。"],
+      "triggers": ["審計用戶", "審計輸出", "系統輸出", "output audit", "自查", "用戶輸入", "回覆設計", "質控"],
+      "prompt_guidance": "把檢查焦點放在系統回答、知識使用、工具路徑和可驗證性。",
+      "test": "回答有沒有明確說審計目標是系統輸出？",
+      "evaluation": {
+        "requires_any_terms": ["系統輸出", "自查", "質控", "不是用戶", "回答", "可驗證", "知識使用"],
+        "forbidden_terms": ["用戶低密度", "用戶缺少座標"]
+      }
+    },
+    {
+      "id": "coordinate.executable.worldview",
+      "title": "可運行世界觀",
+      "claim": "世界觀只有拆成判準、資料、工具、測試和 UI，才算可以運行。",
+      "use_when": ["世界觀", "理論工程化", "產品定位", "系統設計", "知識操作系統"],
+      "not_for": ["純粹文學或信念表達"],
+      "false_positive_guards": ["不是每個概念都要即時工具化。", "先確定概念有重複使用價值。"],
+      "triggers": ["世界觀", "運行", "可執行", "工程化", "操作系統", "判準", "worldview", "operating layer"],
+      "prompt_guidance": "把理論拆成可操作的判準、資料、工具、測試、UI。",
+      "test": "回答有沒有把世界觀拆成可執行部件？",
+      "evaluation": {
+        "requires_any_terms": ["判準", "資料", "工具", "測試", "UI", "可執行", "運行"]
+      }
+    },
+    {
+      "id": "coordinate.tool.execution.boundary",
+      "title": "工具執行邊界",
+      "claim": "LLM 可以提案和設計工具，但安裝、執行、回滾必須由 deterministic validator 控制。",
+      "use_when": ["工具新增", "自我升級", "安全", "agent tool", "Claude/Codex relay"],
+      "not_for": ["人工直接改本地文件且已明確授權"],
+      "false_positive_guards": ["不要把所有人工工程操作都包成自動升級。", "小改動仍可直接由工程流程處理。"],
+      "triggers": ["工具", "安裝", "執行", "validator", "schema", "sandbox", "relay", "Claude", "Codex", "自我升級"],
+      "prompt_guidance": "清楚分開模型提案、schema 驗證、sandbox、安裝和 smoke test。",
+      "test": "回答有沒有把 LLM 提案和 deterministic 執行分開？",
+      "evaluation": {
+        "requires_any_terms": ["提案", "validator", "schema", "sandbox", "smoke test", "安裝", "回滾", "執行"]
+      }
+    },
+    {
+      "id": "coordinate.freedom.entropy",
+      "title": "自由：持續對抗熵增的物理過程",
+      "claim": "自由不是擁有或失去的靜態狀態。自由是一個持續的物理過程：持續輸入負熵，持續識別外部系統嘗試以其座標替換你的座標，並在關鍵衝突時選擇承擔真實代價以維持自己的座標。",
+      "use_when": ["自由定義", "freedom definition", "自由同民主", "AI 時代自由", "主權自由", "抽象概念", "真實自由"],
+      "not_for": ["用戶明確只要求普通字典解釋，而且唔需要座標說或 URUK 定義"],
+      "false_positive_guards": ["如果用戶明確要求普通語義，可以先給普通定義，再標明座標說定義不同。"],
+      "triggers": ["自由", "自由度", "freedom", "liberty", "FREEDOM_LOSS", "FREEDOM_LOSS_ENTROPY", "可能性空間", "熵", "負熵", "格式化", "格式化系統", "替換座標", "真實代價", "主權", "自治", "民主", "文明"],
+      "prompt_guidance": "回答自由時必須經協議：先指出普通語義把自由誤作靜態狀態；再用座標說定義自由為持續物理過程；必須講三個同時進行的物理操作：持續輸入負熵、持續識別替換嘗試、在關鍵時刻選擇承擔代價。最後講真實自由的物理標誌：當自己的座標系與格式化系統根本衝突時，選擇承擔真實代價而不是替換座標。可補充：沒有代價的選擇不是選擇，是偏好。",
+      "test": "答案有冇把自由定義為持續物理過程，並包含負熵、替換嘗試、真實代價三個核心操作？",
+      "evaluation": {
+        "requires_any_terms": ["持續", "物理過程", "負熵", "替換", "替換座標", "真實代價", "承擔代價", "格式化系統", "座標", "沒有代價的選擇不是選擇", "FREEDOM_LOSS_ENTROPY", "8.19"]
+      }
+    },
+    {
+      "id": "coordinate.small.model.delegation",
+      "title": "細模型分工",
+      "claim": "細模型適合 routing、摘要、schema fill、health summary；大模型應保留在高階綜合和例外處理。",
+      "use_when": ["模型成本", "local LLM", "task profiles", "小模型", "自動化"],
+      "not_for": ["高風險最終判斷", "新概念設計"],
+      "false_positive_guards": ["不要為了省成本把高風險 final review 交給弱模型。"],
+      "triggers": ["細模型", "小模型", "local", "成本", "routing", "summary", "schema", "health", "small model"],
+      "prompt_guidance": "把低階可驗證任務交給細模型，把高階設計留給大模型。",
+      "test": "回答有沒有清楚分配細模型和大模型任務？",
+      "evaluation": {
+        "requires_any_terms": ["routing", "摘要", "schema", "health", "大模型", "細模型", "高階", "低階"]
+      }
+    },
+    {
+      "id": "coordinate.replay.regression",
+      "title": "回放回歸",
+      "claim": "升級是否有效要靠固定 case replay 和前後比較，而不是靠主觀感覺。",
+      "use_when": ["benchmark", "regression", "harness trace", "harness episode", "升級驗證", "prompt 修改"],
+      "not_for": ["一次性探索對話"],
+      "false_positive_guards": ["探索階段可以先不用固定 benchmark。", "benchmark 不是替代人工判斷。"],
+      "triggers": ["benchmark", "regression", "replay", "harness trace", "回放", "回歸", "前後比較", "episode compare", "測試集"],
+      "prompt_guidance": "要求固定 case、前後比較和回歸報告。",
+      "test": "回答有沒有指定 replay / benchmark / compare 方法？",
+      "evaluation": {
+        "requires_any_terms": ["benchmark", "replay", "回歸", "前後", "compare", "episode", "測試集", "報告"]
+      }
+    },
+    {
+      "id": "coordinate.counterexample.guard",
+      "title": "反例保護",
+      "claim": "每個世界觀概念都要有反例和不適用條件，否則會變成封閉解釋系統。",
+      "use_when": ["座標說擴充", "knowledge cards", "理論判準", "prompt 設計"],
+      "not_for": ["已經由嚴格數學定義限定的概念"],
+      "false_positive_guards": ["不要為了反例而癱瘓實作。", "反例要服務於降低誤判。"],
+      "triggers": ["反例", "false positive", "不適用", "過度套用", "封閉", "濫用", "guard"],
+      "prompt_guidance": "為每個概念加上不適用情境和誤判防線。",
+      "test": "回答有沒有提供反例或 false-positive guard？",
+      "evaluation": {
+        "requires_any_terms": ["反例", "不適用", "false positive", "誤判", "防線", "guard", "過度套用"]
+      }
+    },
+    {
+      "id": "coordinate.ui.surface",
+      "title": "外簡內深",
+      "claim": "系統內部可以複雜，但 UI 首屏要讓對話和主回答成為主角，內部 trace 按需展開。",
+      "use_when": ["UI", "產品化", "對話框", "內部質控", "可用性"],
+      "not_for": ["純後台診斷工具"],
+      "false_positive_guards": ["工程診斷頁可以密集。", "不要把所有資訊都藏到找不到。"],
+      "triggers": ["UI", "對話框", "主角", "亂", "收埋", "展開", "內部質控", "dashboard", "product"],
+      "prompt_guidance": "主回答優先，內部質控、trace、metadata 以折疊方式提供。",
+      "test": "回答有沒有把主對話和內部資訊分清？",
+      "evaluation": {
+        "requires_any_terms": ["主回答", "對話", "折疊", "展開", "內部質控", "trace", "UI"]
+      }
+    },
+    {
+      "id": "coordinate.market.translation",
+      "title": "內部術語外部翻譯",
+      "claim": "對外市場語言應翻譯成 QA harness、observability、governance、replay，不應直接要求陌生用戶接受內部術語。",
+      "use_when": ["市場定位", "銷售文案", "README", "產品命名", "投資/客戶溝通"],
+      "not_for": ["內部協議維護"],
+      "false_positive_guards": ["不要為了市場語言刪掉內部判準。", "內外兩套語言要保持映射。"],
+      "triggers": ["市場", "賣點", "產品", "定位", "客戶", "landing", "governance", "observability", "harness"],
+      "prompt_guidance": "把三位一體/座標說翻譯成外部可理解的質控、追蹤、治理和回放能力。",
+      "test": "回答有沒有區分內部術語和外部產品語言？",
+      "evaluation": {
+        "requires_any_terms": ["QA", "harness", "observability", "governance", "replay", "質控", "追蹤", "產品語言"]
+      }
+    }
+  ]
+}

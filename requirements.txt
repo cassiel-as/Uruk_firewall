@@ -1,0 +1,35 @@
+httpx>=0.27.0
+pyyaml>=6.0
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+beautifulsoup4>=4.12.0
+icalendar>=5.0.0
+# RAG Phase 2 (v8.30) — numpy-backed TF-IDF retriever.
+# fastembed was the original target but fails to install on Python 3.14
+# due to its transitive py-rust-stemmers Rust build dep. numpy alone is
+# sufficient for the current corpus size (~525 chunks).
+numpy>=1.26
+# v8.42 — Planner-Executor Agent (computer_tools.py)
+# pyautogui: cross-platform desktop automation (mouse / keyboard / screenshot)
+# pillow: screenshot resize + PNG encode (also pyautogui dep)
+# Install: pip install pyautogui pillow
+# OPTIONAL — only required when using /api/agent/* endpoints
+# If not installed, computer_tools.py degrades gracefully (no desktop control)
+pyautogui>=0.9.54
+pillow>=10.0
+# v8.43 — New agent tools: extract_document / clipboard / checkpoint
+# pdfplumber: PDF structured extraction (preserves tables)
+# python-docx: DOCX extraction
+# pyperclip: cross-platform clipboard read/write
+# Install: pip install pdfplumber python-docx pyperclip
+# OPTIONAL — all three degrade gracefully if not installed
+pdfplumber>=0.11.0
+python-docx>=1.1.0
+pyperclip>=1.8.2
+# v8.43 — Agent Schedule API (APScheduler)
+# apscheduler: cron + interval scheduling for agent runs
+# Install: pip install apscheduler
+# OPTIONAL — degrades gracefully if not installed (schedules saved but not executed)
+apscheduler>=3.10.0
+# pywebview>=5.0   # OPTIONAL — native desktop window only; Python 3.14 may not build its pythonnet dependency.
+# desktop_launcher.py degrades to a browser window when pywebview is unavailable.

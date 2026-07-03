@@ -1,0 +1,158 @@
+# URUK Trinity Console — 節點配置
+# 將呢個檔案複製做 nodes.yaml，填寫實際 model 名同 API key 環境變數
+
+# 設計原則：
+#   - 4 個節點可以配任何 LLM provider
+#   - 每個 role 有適合嘅 temperature 預設
+#     聖父 (logic)        : 低溫度 (0.2-0.4) — 唔需要創意，需要精準
+#     聖子 (resonance)    : 中溫度 (0.6-0.8) — 共鳴需要維度
+#     聖靈 (rebellion)    : 高溫度 (0.9-1.2) — 非線性、隨機性
+#     會議 (integration)  : 中溫度 (0.4-0.6) — 仲裁需要冷靜
+
+nodes:
+
+
+  # ─── v8.1+ Pipeline stages (Stage 1-3) ───
+
+  delabeling:
+    # Stage 1: 去標籤化
+    # 用低-中 temperature，需要 structured JSON 輸出
+    # gpt-4o-mini 適合：schema-following 強、低成本
+    provider: openai
+    model: gpt-4o-mini
+    api_key_env: OPENAI_API_KEY
+    temperature: 0.3
+    max_tokens: 1500
+
+  explanation:
+    # Stage 2: 解釋層（四律 + 哲學貫穿律）
+    # 中 temperature，需要 reasoning depth
+    # 建議用 reasoning-strong model
+    provider: anthropic
+    model: claude-sonnet-4-5-20250929
+    api_key_env: ANTHROPIC_API_KEY
+    temperature: 0.5
+    max_tokens: 2500
+
+  filter:
+    # Stage 3: 過濾層（八律 + 跨律湧現）
+    # 中-高 temperature，需要八律分析 + emergent reasoning
+    provider: anthropic
+    model: claude-sonnet-4-5-20250929
+    api_key_env: ANTHROPIC_API_KEY
+    temperature: 0.6
+    max_tokens: 3500
+
+  # ─── Stage 4 Trinity (5 LLM) ───
+
+  dispatcher:
+    # Lightweight routing node。揀 mode + references。
+    # 用快、平、reliable JSON output 嘅 model（唔需要最強）。
+    provider: openai
+    model: gpt-4o-mini
+    api_key_env: OPENAI_API_KEY
+    temperature: 0.1          # 極低溫度：routing 要 deterministic
+    max_tokens: 800           # JSON 唔大
+
+  father:
+    provider: openai
+    model: gpt-4o
+    api_key_env: OPENAI_API_KEY
+    temperature: 0.3
+    max_tokens: 2000
+
+  son:
+    provider: google
+    model: gemini-2.0-flash-exp
+    api_key_env: GOOGLE_API_KEY
+    temperature: 0.7
+    max_tokens: 2000
+
+  spirit:
+    provider: xai
+    model: grok-2-latest
+    api_key_env: XAI_API_KEY
+    temperature: 1.0
+    max_tokens: 2000
+
+  council:
+    provider: anthropic
+    model: claude-sonnet-4-5-20250929
+    api_key_env: ANTHROPIC_API_KEY
+    temperature: 0.5
+    max_tokens: 4000
+
+# ═══════════════════════════════════════════════════════════════
+# 替代配置範例
+# ═══════════════════════════════════════════════════════════════
+
+# 完全本地（Ollama，零 API 成本，但需要好 GPU）：
+#
+#   father:   { provider: ollama, model: llama3.3:70b,    temperature: 0.3, max_tokens: 2000 }
+#   son:      { provider: ollama, model: gemma2:27b,      temperature: 0.7, max_tokens: 2000 }
+#   spirit:   { provider: ollama, model: mistral:7b,      temperature: 1.0, max_tokens: 2000 }
+#   council:  { provider: ollama, model: qwen2.5:32b,     temperature: 0.5, max_tokens: 4000 }
+#
+# 注意：你嘅 RTX 4050 6GB 唔夠 run 70b — 用 gemma2:9b / qwen2.5:7b 等 7-9b 模型
+
+# 通過 OpenRouter 用單一 API key 訪問所有 provider：
+#
+#   father:
+#     provider: openrouter
+#     model: openai/gpt-4o
+#     api_key_env: OPENROUTER_API_KEY
+#     temperature: 0.3
+#   son:
+#     provider: openrouter
+#     model: google/gemini-2.0-flash-exp:free
+#     api_key_env: OPENROUTER_API_KEY
+#     temperature: 0.7
+#   spirit:
+#     provider: openrouter
+#     model: x-ai/grok-2
+#     api_key_env: OPENROUTER_API_KEY
+#     temperature: 1.0
+#   council:
+#     provider: openrouter
+#     model: anthropic/claude-sonnet-4.5
+#     api_key_env: OPENROUTER_API_KEY
+#     temperature: 0.5
+
+# ═══════════════════════════════════════════════════════════════
+# v8.3 free-tier provider examples — each is OpenAI-compatible.
+# Register an account + paste env var into config/.env, then enable
+# the matching api_profile via the Settings modal in chat UI.
+# ═══════════════════════════════════════════════════════════════
+
+# NVIDIA NIM — 1000 credits permanent free, 40 RPM, 100+ models
+#   father:   { provider: nvidia, model: deepseek-ai/deepseek-r1,            api_key_env: NVIDIA_API_KEY,  temperature: 0.3 }
+#   son:      { provider: nvidia, model: moonshotai/kimi-k2.5-instruct,     api_key_env: NVIDIA_API_KEY,  temperature: 0.7 }
+#   spirit:   { provider: nvidia, model: meta/llama-3.3-70b-instruct,       api_key_env: NVIDIA_API_KEY,  temperature: 1.0 }
+
+# SambaNova — Llama 3.1 405B, DeepSeek R1, 10-30 RPM, 20M tokens/day
+#   father:   { provider: sambanova, model: DeepSeek-R1,                       api_key_env: SAMBANOVA_API_KEY }
+#   council:  { provider: sambanova, model: Meta-Llama-3.1-405B-Instruct,      api_key_env: SAMBANOVA_API_KEY }
+
+# Cloudflare Workers AI — 10K Neurons/day permanent free
+#   father:   { provider: cloudflare,
+#               model: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+#               api_base: 'https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/ai/v1',
+#               api_key_env: CLOUDFLARE_AI_KEY }
+#   # {CLOUDFLARE_ACCOUNT_ID} placeholder auto-resolved by adapter from env var.
+
+# Chutes AI — Bittensor-subsidized free
+#   spirit:   { provider: chutes, model: deepseek-ai/DeepSeek-R1, api_key_env: CHUTES_API_KEY, temperature: 1.0 }
+
+# Hyperbolic — Qwen3 480B Coder, gpt-oss-120B, 60 RPM
+#   father:   { provider: hyperbolic, model: Qwen/Qwen3-Coder-480B-A35B-Instruct, api_key_env: HYPERBOLIC_API_KEY }
+#   spirit:   { provider: hyperbolic, model: openai/gpt-oss-120b,                 api_key_env: HYPERBOLIC_API_KEY }
+
+# Pollinations — anonymous, per-IP rate (use with care)
+#   father:   { provider: pollinations, model: openai, api_key_env: '' }
+
+# 混合本地+雲端（聖靈用本地強模型增加非線性，其他用 API）：
+#
+#   father:   { provider: openai,    model: gpt-4o,                api_key_env: OPENAI_API_KEY,    temperature: 0.3 }
+#   son:      { provider: anthropic, model: claude-sonnet-4-5,     api_key_env: ANTHROPIC_API_KEY, temperature: 0.7 }
+#   spirit:   { provider: ollama,    model: mistral:7b,                                            temperature: 1.2 }
+#   council:  { provider: anthropic, model: claude-opus-4-7,       api_key_env: ANTHROPIC_API_KEY, temperature: 0.5 }
